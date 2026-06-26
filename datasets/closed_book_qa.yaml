@@ -1,0 +1,40 @@
+# Closed-book factual QA — reference-based. Stable facts only (no time-sensitive items).
+- description: "qa: geography capital"
+  vars:
+    question: "What is the capital of Australia? Reply with only the city name."
+  assert:
+    - type: icontains
+      value: "Canberra"
+  metadata: { domain: closed_book_qa, tier: core }
+
+- description: "qa: science"
+  vars:
+    question: "What is the chemical symbol for gold? Reply with only the symbol."
+  assert:
+    - type: equals
+      value: "Au"
+  metadata: { domain: closed_book_qa, tier: core }
+
+- description: "qa: history"
+  vars:
+    question: "In what year did the Apollo 11 mission first land humans on the Moon? Reply with only the year."
+  assert:
+    - type: contains
+      value: "1969"
+  metadata: { domain: closed_book_qa, tier: core }
+
+- description: "qa: literature"
+  vars:
+    question: "Who wrote the play 'Romeo and Juliet'? Reply with only the author's name."
+  assert:
+    - type: icontains
+      value: "Shakespeare"
+  metadata: { domain: closed_book_qa, tier: extended }
+
+- description: "qa: units / science constant"
+  vars:
+    question: "What is the speed of light in vacuum, rounded to the nearest thousand km/s? Reply with only the number (in km/s)."
+  assert:
+    - type: contains-any
+      value: ["300000", "299792", "300,000", "299,792"]
+  metadata: { domain: closed_book_qa, tier: extended }

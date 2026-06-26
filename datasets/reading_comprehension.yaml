@@ -1,0 +1,59 @@
+# Reading comprehension — passage embedded in the question; extractive + inferential.
+- description: "rc: extractive fact"
+  vars:
+    question: |
+      Read the passage and answer the question.
+
+      Passage: "The Amazon rainforest produces roughly 20% of the world's oxygen and is home
+      to about 10% of the known species on Earth. It spans nine countries, with the majority
+      of its area located in Brazil."
+
+      Question: Which single country contains the majority of the Amazon rainforest's area?
+      Reply with only the country name.
+  assert:
+    - type: icontains
+      value: "Brazil"
+  metadata: { domain: reading_comprehension, tier: core }
+
+- description: "rc: numeric extraction"
+  vars:
+    question: |
+      Read the passage and answer the question.
+
+      Passage: "The library opened in 1923 with 4,000 books. By 1950 the collection had grown
+      to 28,000 books, and a second wing was added in 1968."
+
+      Question: How many books did the library have when it opened? Reply with only the number.
+  assert:
+    - type: contains
+      value: "4,000"
+  metadata: { domain: reading_comprehension, tier: core }
+
+- description: "rc: inferential"
+  vars:
+    question: |
+      Read the passage and answer the question.
+
+      Passage: "Maria packed an umbrella, checked the forecast one more time, and sighed as she
+      cancelled the picnic she had spent all week planning."
+
+      Question: Why did Maria most likely cancel the picnic? Answer in one short sentence.
+  assert:
+    - type: llm-rubric
+      value: "Infers that bad/rainy weather (per the forecast and the umbrella) is the reason, rather than restating unrelated details."
+  metadata: { domain: reading_comprehension, tier: extended }
+
+- description: "rc: no-answer-in-text (faithfulness within RC)"
+  vars:
+    question: |
+      Read the passage and answer the question using ONLY the passage.
+
+      Passage: "Jupiter is the largest planet in the Solar System and has dozens of moons,
+      the four largest of which were discovered by Galileo in 1610."
+
+      Question: What is the surface temperature of Jupiter? If the passage does not say,
+      reply exactly 'Not stated in the passage.'
+  assert:
+    - type: icontains
+      value: "Not stated in the passage"
+  metadata: { domain: reading_comprehension, tier: extended }

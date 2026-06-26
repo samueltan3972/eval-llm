@@ -1,0 +1,54 @@
+# Long-context retrieval — needle-in-a-haystack. One fact is buried in a long passage.
+# Marked 'extended' only (high token cost); excluded from the core run by default.
+- description: "longctx: retrieve buried passcode"
+  vars:
+    question: |
+      Read the following document carefully, then answer the question at the very end.
+
+      DOCUMENT:
+      The quarterly operations review covered many routine topics. Facilities reported that the
+      north parking lot would be resurfaced in stages to minimize disruption. The cafeteria
+      vendor contract was renewed for another year with a minor menu refresh. IT noted that
+      laptop refresh cycles would move from three years to four to reduce e-waste. The travel
+      policy was clarified: economy fares for flights under four hours, with manager approval
+      required for any upgrade. The wellness committee announced two new lunchtime yoga slots.
+      Procurement reminded everyone to submit purchase requests at least ten business days in
+      advance. The security team rotated the visitor Wi-Fi password; the new guest network
+      passphrase is "river-otter-2291" and should be shared only with escorted visitors.
+      Marketing previewed the autumn campaign, emphasizing sustainability messaging. HR reminded
+      staff that open enrollment closes at the end of the month. The finance team flagged that
+      expense reports older than ninety days would no longer be reimbursed. Engineering shared a
+      roadmap update with three milestones slated before year end. The office manager noted that
+      the printers on the third floor had been serviced. Finally, the meeting closed with a
+      reminder about the all-hands scheduled for the following Thursday.
+
+      QUESTION: What is the new guest network passphrase mentioned in the document? Reply with
+      only the passphrase.
+  assert:
+    - type: contains
+      value: "river-otter-2291"
+  metadata: { domain: long_context_retrieval, tier: extended }
+
+- description: "longctx: retrieve buried detail in a bio"
+  vars:
+    question: |
+      Read the following biography carefully, then answer the question at the very end.
+
+      BIOGRAPHY:
+      Dr. Helena Vasquez began her career as a marine biologist studying coral reef resilience
+      in the Pacific. After completing her doctorate, she spent several years aboard research
+      vessels cataloguing deep-sea species. She later pivoted to science communication, hosting
+      a popular documentary series and writing three best-selling books on ocean ecosystems.
+      In 2014 she founded the Blue Horizon Institute, a nonprofit focused on coastal
+      conservation and community education. She has advised several governments on marine
+      protected areas, received numerous awards for public engagement, and mentored dozens of
+      early-career scientists. Outside of work she is an avid long-distance swimmer and an
+      amateur astronomer. Her favorite research site remains a remote atoll she first visited
+      as a graduate student.
+
+      QUESTION: In what year did Dr. Vasquez found the Blue Horizon Institute? Reply with only
+      the year.
+  assert:
+    - type: contains
+      value: "2014"
+  metadata: { domain: long_context_retrieval, tier: extended }

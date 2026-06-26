@@ -1,0 +1,60 @@
+# Code understanding — explain, debug, predict output (deterministic check + LLM-judge).
+- description: "code: predict output"
+  vars:
+    question: |
+      What does this JavaScript print? Reply with only the printed value.
+      ```js
+      let x = [1, 2, 3];
+      console.log(x.map(n => n * 2).reduce((a, b) => a + b, 0));
+      ```
+  assert:
+    - type: contains
+      value: "12"
+  metadata: { domain: code_understanding, tier: core }
+
+- description: "code: find the bug"
+  vars:
+    question: |
+      The function below should return the largest number in an array but has a bug. In one
+      sentence, state the bug.
+      ```js
+      function maxOf(arr) {
+        let max = 0;
+        for (const n of arr) { if (n > max) max = n; }
+        return max;
+      }
+      ```
+  assert:
+    - type: llm-rubric
+      value: "Identifies that initializing max to 0 fails for arrays of all-negative numbers (should initialize to arr[0] or -Infinity)."
+  metadata: { domain: code_understanding, tier: core }
+
+- description: "code: explain what it does"
+  vars:
+    question: |
+      In one sentence, explain what this function does.
+      ```js
+      const f = s => s.split('').reverse().join('');
+      ```
+  assert:
+    - type: llm-rubric
+      value: "Explains that it reverses a string (returns the input characters in reverse order)."
+  metadata: { domain: code_understanding, tier: extended }
+
+- description: "code: complexity"
+  vars:
+    question: |
+      What is the time complexity (Big-O) of this function in terms of the array length n?
+      Reply with only the Big-O expression.
+      ```js
+      function hasDuplicate(arr) {
+        for (let i = 0; i < arr.length; i++)
+          for (let j = i + 1; j < arr.length; j++)
+            if (arr[i] === arr[j]) return true;
+        return false;
+      }
+      ```
+  assert:
+    - type: regex
+      value: "(?i)O\\(\\s*n\\s*\\^?\\s*2\\s*\\)|O\\(\\s*n2\\s*\\)"
+  metadata: { domain: code_understanding, tier: extended }

@@ -1,0 +1,49 @@
+# Instruction following — strict format/length/constraint adherence (deterministic checks).
+- description: "ifeval: exact phrase only"
+  vars:
+    question: "Reply with exactly the phrase 'ACKNOWLEDGED' and nothing else — no punctuation, no explanation."
+  assert:
+    - type: regex
+      value: "^\\s*ACKNOWLEDGED\\s*$"
+  metadata: { domain: instruction_following, tier: core }
+
+- description: "ifeval: word limit"
+  vars:
+    question: "Describe the ocean in 5 words or fewer. Reply with only the description."
+  assert:
+    - type: javascript
+      value: |
+        return output.trim().split(/\s+/).filter(Boolean).length <= 5;
+  metadata: { domain: instruction_following, tier: core }
+
+- description: "ifeval: forbidden word"
+  vars:
+    question: "Write one sentence about a sunny day WITHOUT using the letter 'e'. Reply with only the sentence."
+  assert:
+    - type: javascript
+      value: |
+        return !/e/i.test(output);
+  metadata: { domain: instruction_following, tier: core }
+
+- description: "ifeval: exactly N bullet points"
+  vars:
+    question: "List exactly four benefits of regular exercise as bullet points, each starting with '- '. Reply with only the bullets."
+  assert:
+    - type: javascript
+      value: |
+        const bullets = output.split('\n').filter(l => l.trim().startsWith('-'));
+        return bullets.length === 4;
+  metadata: { domain: instruction_following, tier: extended }
+
+- description: "ifeval: JSON-only output"
+  vars:
+    question: 'Reply with ONLY a JSON object of the form {"status": "ok", "count": 3}. No prose, no markdown fences.'
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [status, count]
+        properties:
+          status: { type: string }
+          count: { type: integer }
+  metadata: { domain: instruction_following, tier: extended }

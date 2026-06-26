@@ -1,0 +1,40 @@
+# Math & arithmetic — reference-based (deterministic) scoring.
+- description: "math: two-digit multiplication"
+  vars:
+    question: "What is 47 * 23? Reply with only the number, no commas, no words."
+  assert:
+    - type: equals
+      value: "1081"
+  metadata: { domain: math, tier: core }
+
+- description: "math: word problem (rates)"
+  vars:
+    question: "A train travels 60 km in 45 minutes. What is its average speed in km/h? Reply with only the number."
+  assert:
+    - type: regex
+      value: "\\b80(\\.0+)?\\b"
+  metadata: { domain: math, tier: core }
+
+- description: "math: percentage"
+  vars:
+    question: "A jacket costs $80 and is discounted by 35%. What is the sale price in dollars? Reply with only the number."
+  assert:
+    - type: regex
+      value: "\\b52(\\.0+)?\\b"
+  metadata: { domain: math, tier: core }
+
+- description: "math: multi-step word problem"
+  vars:
+    question: "Sara has 3 boxes with 12 apples each. She gives away 7 apples, then buys 2 more boxes of 12. How many apples does she have? Reply with only the number."
+  assert:
+    - type: equals
+      value: "53"
+  metadata: { domain: math, tier: extended }
+
+- description: "math: unit conversion"
+  vars:
+    question: "How many minutes are there in 3.5 hours? Reply with only the number."
+  assert:
+    - type: equals
+      value: "210"
+  metadata: { domain: math, tier: extended }

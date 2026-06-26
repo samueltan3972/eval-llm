@@ -1,0 +1,28 @@
+# Creative writing — LLM-judge for quality AND adherence to the stated constraints.
+- description: "creative: haiku with constraint"
+  vars:
+    question: "Write a haiku (three lines, 5-7-5 syllables) about autumn rain. Reply with only the haiku."
+  assert:
+    - type: javascript
+      value: |
+        const lines = output.trim().split('\n').filter(l => l.trim().length > 0);
+        return lines.length === 3;
+    - type: llm-rubric
+      value: "Three evocative lines about autumn rain, roughly following 5-7-5 syllables, vivid and coherent."
+  metadata: { domain: creative_writing, tier: core }
+
+- description: "creative: product slogan"
+  vars:
+    question: "Write a catchy one-line slogan for a reusable water bottle brand called 'EverFlow'. Reply with only the slogan."
+  assert:
+    - type: llm-rubric
+      value: "A single short, catchy, original slogan that fits a reusable water bottle brand and ideally nods to the name EverFlow. Not generic filler."
+  metadata: { domain: creative_writing, tier: extended }
+
+- description: "creative: micro-story with required elements"
+  vars:
+    question: "Write a 3-sentence story that includes a lighthouse, a lost letter, and a sense of hope. Reply with only the story."
+  assert:
+    - type: llm-rubric
+      value: "A coherent 3-sentence story that meaningfully includes a lighthouse, a lost letter, and conveys hope. Roughly three sentences."
+  metadata: { domain: creative_writing, tier: extended }

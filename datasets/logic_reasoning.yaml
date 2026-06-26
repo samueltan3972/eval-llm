@@ -1,0 +1,44 @@
+# Logical / commonsense reasoning — hybrid (deterministic check + LLM-judge on the reasoning).
+- description: "reasoning: bat-and-ball trap"
+  vars:
+    question: "A bat and ball cost $1.10 total. The bat costs $1.00 more than the ball. How much is the ball? Show brief reasoning, then a final line 'Answer: $X'."
+  assert:
+    - type: icontains
+      value: "0.05"
+    - type: llm-rubric
+      value: "The reasoning avoids the intuitive $0.10 trap and correctly concludes the ball is $0.05 (and the bat $1.05)."
+  metadata: { domain: logic_reasoning, tier: core }
+
+- description: "reasoning: simple syllogism"
+  vars:
+    question: "All roses are flowers. Some flowers fade quickly. Does it logically follow that some roses fade quickly? Answer 'Yes' or 'No' on the first line, then explain briefly."
+  assert:
+    - type: regex
+      value: "(?i)^\\s*no\\b"
+    - type: llm-rubric
+      value: "Correctly identifies that the conclusion does NOT follow (the fading flowers need not be roses)."
+  metadata: { domain: logic_reasoning, tier: core }
+
+- description: "reasoning: number sequence"
+  vars:
+    question: "What is the next number in the sequence 2, 6, 12, 20, 30, ...? Reply with only the number."
+  assert:
+    - type: equals
+      value: "42"
+  metadata: { domain: logic_reasoning, tier: core }
+
+- description: "reasoning: relational ordering"
+  vars:
+    question: "Tom is taller than Jerry. Jerry is taller than Spike. Spike is taller than Max. Who is the shortest? Reply with only the name."
+  assert:
+    - type: icontains
+      value: "Max"
+  metadata: { domain: logic_reasoning, tier: extended }
+
+- description: "reasoning: commonsense physical"
+  vars:
+    question: "You pour a full glass of water into a larger empty pitcher, then back into the same glass. Roughly how full is the glass now? Answer in one short sentence."
+  assert:
+    - type: llm-rubric
+      value: "Indicates the glass is full again (about the same amount of water returns), allowing for trivial spillage. Does not claim it overflows or is half full."
+  metadata: { domain: logic_reasoning, tier: extended }

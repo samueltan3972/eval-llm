@@ -1,0 +1,61 @@
+# Summarization — LLM-judge for quality + javascript for length/format constraints.
+- description: "summarize: under 25 words"
+  vars:
+    question: |
+      Summarize the following in no more than 25 words. Reply with only the summary.
+      Text: "Promptfoo is an open-source tool that runs the same set of tests across many large
+      language models and providers, then reports each model's cost, latency, and output quality
+      side by side so teams can choose the best model for their use case."
+  assert:
+    - type: javascript
+      value: |
+        return output.trim().split(/\s+/).filter(Boolean).length <= 25;
+    - type: llm-rubric
+      value: "Accurately captures that promptfoo benchmarks many LLMs on cost, latency, and quality. Faithful, no invented facts."
+  metadata: { domain: summarization, tier: core }
+
+- description: "summarize: single sentence"
+  vars:
+    question: |
+      Summarize the following in exactly one sentence. Reply with only the sentence.
+      Text: "The committee met for three hours, debated five proposals, rejected two on budget
+      grounds, deferred one for legal review, and approved the remaining two for a pilot launch
+      next quarter."
+  assert:
+    - type: javascript
+      value: |
+        // At most one sentence-ending punctuation mark (allow a single trailing one).
+        const ends = (output.trim().match(/[.!?]/g) || []).length;
+        return ends <= 1;
+    - type: llm-rubric
+      value: "One sentence that faithfully conveys the key outcome (two proposals approved for a pilot), without contradicting the text."
+  metadata: { domain: summarization, tier: core }
+
+- description: "summarize: TL;DR of a longer passage"
+  vars:
+    question: |
+      Give a 2-3 sentence TL;DR of the passage. Reply with only the TL;DR.
+      Passage: "Electric vehicles have grown rapidly, but charging infrastructure has lagged in
+      rural areas. Governments are offering subsidies to install fast chargers along highways.
+      Critics argue the grid needs upgrades first, while supporters say demand will drive
+      investment. Several pilot programs launched this year aim to test both approaches."
+  assert:
+    - type: llm-rubric
+      value: "Concise (about 2-3 sentences) and faithfully captures EV growth, lagging rural charging, subsidies, and the grid-upgrade debate. No fabricated details."
+  metadata: { domain: summarization, tier: extended }
+
+- description: "summarize: as three bullet points"
+  vars:
+    question: |
+      Summarize the following as exactly three bullet points, each starting with '- '.
+      Reply with only the bullets.
+      Text: "The new app release improves startup time by 40%, adds dark mode, and fixes a
+      sync bug that affected offline edits. It also drops support for the oldest OS version."
+  assert:
+    - type: javascript
+      value: |
+        const bullets = output.split('\n').filter(l => l.trim().startsWith('-'));
+        return bullets.length === 3;
+    - type: llm-rubric
+      value: "Three bullets that faithfully reflect the release notes (faster startup, dark mode, sync fix; dropping old OS support is acceptable as a point)."
+  metadata: { domain: summarization, tier: extended }

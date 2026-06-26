@@ -1,0 +1,84 @@
+# Code generation — the javascript assertion actually executes the generated function.
+# Each prompt asks for a single named JS function; the assertion strips any code fences,
+# instantiates the function, and runs real test inputs against expected outputs.
+- description: "codegen: add(a, b)"
+  vars:
+    question: "Write a JavaScript function named `add` that takes two numbers and returns their sum. Return only the function definition (a code block is fine)."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof add === 'function' ? add : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `add` not found' };
+        const ok = fn(2,3) === 5 && fn(-1,1) === 0 && fn(0,0) === 0;
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+    - type: llm-rubric
+      value: "The function is clean and correct JavaScript for adding two numbers."
+  metadata: { domain: code_generation, tier: core }
+
+- description: "codegen: isPalindrome(s)"
+  vars:
+    question: "Write a JavaScript function named `isPalindrome` that returns true if a string reads the same forwards and backwards (case-insensitive, ignoring non-alphanumeric characters), else false. Return only the function definition."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof isPalindrome === 'function' ? isPalindrome : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `isPalindrome` not found' };
+        const ok = fn('racecar') === true && fn('A man, a plan, a canal: Panama') === true && fn('hello') === false;
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+  metadata: { domain: code_generation, tier: core }
+
+- description: "codegen: fizzbuzz(n)"
+  vars:
+    question: "Write a JavaScript function named `fizzbuzz` that, given a single integer n, returns the string 'Fizz' if n is divisible by 3, 'Buzz' if divisible by 5, 'FizzBuzz' if divisible by both, otherwise the number as a string. Return only the function definition."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof fizzbuzz === 'function' ? fizzbuzz : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `fizzbuzz` not found' };
+        const ok = fn(3) === 'Fizz' && fn(5) === 'Buzz' && fn(15) === 'FizzBuzz' && String(fn(7)) === '7';
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+  metadata: { domain: code_generation, tier: extended }
+
+- description: "codegen: factorial(n)"
+  vars:
+    question: "Write a JavaScript function named `factorial` that returns n! for a non-negative integer n (factorial(0) === 1). Return only the function definition."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof factorial === 'function' ? factorial : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `factorial` not found' };
+        const ok = fn(0) === 1 && fn(1) === 1 && fn(5) === 120;
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+  metadata: { domain: code_generation, tier: extended }
+
+- description: "codegen: sumArray(arr)"
+  vars:
+    question: "Write a JavaScript function named `sumArray` that returns the sum of all numbers in an array (returns 0 for an empty array). Return only the function definition."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof sumArray === 'function' ? sumArray : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `sumArray` not found' };
+        const ok = fn([1,2,3]) === 6 && fn([]) === 0 && fn([-5,5]) === 0;
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+  metadata: { domain: code_generation, tier: extended }

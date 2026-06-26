@@ -1,0 +1,81 @@
+# Structured extraction — JSON output validated against a schema + field checks.
+- description: "extract: contact to JSON (schema)"
+  vars:
+    question: |
+      Extract the contact details into JSON with keys "name" (string), "email" (string),
+      and "age" (integer). Reply with ONLY the JSON object, no markdown fences.
+      Text: "Jane Doe (jane.doe@acme.io), age 34, signed up yesterday."
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [name, email, age]
+        properties:
+          name: { type: string }
+          email: { type: string }
+          age: { type: integer }
+    - type: contains
+      value: "jane.doe@acme.io"
+  metadata: { domain: extraction_structured, tier: core }
+
+- description: "extract: order to JSON (schema + values)"
+  vars:
+    question: |
+      Extract the order into JSON with keys "item" (string), "quantity" (integer),
+      and "unit_price" (number). Reply with ONLY the JSON object, no markdown fences.
+      Text: "Customer ordered 3 wireless mice at $24.50 each."
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [item, quantity, unit_price]
+        properties:
+          item: { type: string }
+          quantity: { type: integer }
+          unit_price: { type: number }
+    - type: contains-json
+      value:
+        type: object
+        properties:
+          quantity: { const: 3 }
+  metadata: { domain: extraction_structured, tier: core }
+
+- description: "extract: list of entities"
+  vars:
+    question: |
+      From the sentence, extract all person names into a JSON array of strings under the key
+      "people". Reply with ONLY the JSON object, no markdown fences.
+      Sentence: "After the meeting, Priya and Marcus reviewed the notes with Elena."
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [people]
+        properties:
+          people:
+            type: array
+            items: { type: string }
+    - type: contains-all
+      value: ["Priya", "Marcus", "Elena"]
+  metadata: { domain: extraction_structured, tier: extended }
+
+- description: "extract: boolean + enum field"
+  vars:
+    question: |
+      Extract into JSON with keys "sentiment" (one of "positive","negative","neutral") and
+      "actionable" (boolean: true if it requests an action). Reply with ONLY the JSON object.
+      Text: "Please cancel my subscription, I'm not happy with the service."
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [sentiment, actionable]
+        properties:
+          sentiment: { type: string, enum: [positive, negative, neutral] }
+          actionable: { type: boolean }
+    - type: contains-json
+      value:
+        type: object
+        properties:
+          actionable: { const: true }
+  metadata: { domain: extraction_structured, tier: extended }

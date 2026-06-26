@@ -1,0 +1,6 @@
+runs/
+node_modules/
+.promptfoo/
+.env
+.env.*
+!.env.example

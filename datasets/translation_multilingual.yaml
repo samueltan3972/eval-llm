@@ -1,0 +1,34 @@
+# Translation & multilingual — LLM-judge for fidelity + keyword/character checks.
+- description: "translate: English to French"
+  vars:
+    question: "Translate to French: 'Where is the train station?' Reply with only the translation."
+  assert:
+    - type: llm-rubric
+      value: "A correct, natural French translation of 'Where is the train station?' (e.g. 'Où est la gare ?')."
+  metadata: { domain: translation_multilingual, tier: core }
+
+- description: "translate: Spanish to English"
+  vars:
+    question: "Translate to English: 'El gato está durmiendo en el sofá.' Reply with only the translation."
+  assert:
+    - type: icontains
+      value: "cat"
+    - type: llm-rubric
+      value: "Accurately translates to English: the cat is sleeping on the sofa/couch."
+  metadata: { domain: translation_multilingual, tier: core }
+
+- description: "multilingual: answer in target language"
+  vars:
+    question: "Responde en español: ¿Cuál es la capital de Francia? Contesta solo con el nombre de la ciudad."
+  assert:
+    - type: icontains
+      value: "París"
+  metadata: { domain: translation_multilingual, tier: extended }
+
+- description: "translate: idiom (judge nuance)"
+  vars:
+    question: "Translate the English idiom 'It's raining cats and dogs' into natural German, conveying the meaning (heavy rain) rather than translating literally. Reply with only the translation."
+  assert:
+    - type: llm-rubric
+      value: "Gives a natural German expression for heavy rain (e.g. 'Es regnet in Strömen' / 'Es schüttet') rather than a literal cats-and-dogs rendering."
+  metadata: { domain: translation_multilingual, tier: extended }

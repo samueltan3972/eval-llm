@@ -1,0 +1,15 @@
+{
+  "name": "eval-llm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Compare LLMs on cost, speed, and output quality across task domains (promptfoo).",
+  "scripts": {
+    "eval": "promptfoo eval -c promptfooconfig.yaml -o runs/results.html -o runs/results.json",
+    "eval:core": "promptfoo eval -c promptfooconfig.yaml --filter-metadata tier=core -o runs/results.html -o runs/results.json",
+    "eval:sample": "promptfoo eval -c promptfooconfig.yaml --filter-sample 8 -o runs/results.html -o runs/results.json",
+    "view": "promptfoo view -y"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.118.0"
+  }
+}

@@ -1,0 +1,50 @@
+# promptfoo: compare LLMs on cost, speed, and output quality across many task domains.
+#
+# Run (comprehensive, all domains):
+#   npx promptfoo@latest eval -c promptfooconfig.yaml -o runs/results.html -o runs/results.json
+# Run a coverage level / single domain (see README "Coverage levels"):
+#   npx promptfoo@latest eval --filter-metadata tier=core
+#   npx promptfoo@latest eval --filter-metadata domain=code_generation
+# View results in the GUI:
+#   npx promptfoo@latest view
+#
+# Needs ANTHROPIC_API_KEY. The two Anthropic models below run on that single key.
+# Uncomment the OpenAI provider (and set OPENAI_API_KEY) to compare a 3rd model/provider.
+
+description: "LLM cost/speed/quality comparison across task domains"
+
+providers:
+  - id: anthropic:messages:claude-opus-4-8
+    config:
+      max_tokens: 4096        # headroom so code/reasoning answers aren't truncated
+      # thinking: { type: adaptive }   # optional: enable adaptive thinking (Opus 4.8)
+  - id: anthropic:messages:claude-haiku-4-5
+    config:
+      max_tokens: 4096
+  # - id: openai:gpt-4o       # uncomment if OPENAI_API_KEY is set (3rd model, another provider)
+  #   config:
+  #     max_tokens: 4096
+
+# The same prompt is sent verbatim to every provider — apples-to-apples. Each test case puts its
+# full instruction in the `question` var (so passages/context are self-contained per case).
+prompts:
+  - "{{question}}"
+
+# Applies to every test case.
+defaultTest:
+  # Blind, swappable LLM-as-judge: llm-rubric assertions are graded by this model. The grader
+  # sees only the output + rubric — never which provider produced the answer. Switch to
+  # anthropic:messages:claude-haiku-4-5 to cut judge cost on large runs.
+  options:
+    provider: anthropic:messages:claude-opus-4-8
+  assert:
+    # Surface speed and cost on every cell. Thresholds are generous so they inform rather than
+    # fail the run; tighten them to turn cost/latency into hard gates.
+    - type: latency
+      threshold: 60000        # milliseconds
+    - type: cost
+      threshold: 1.0          # US dollars per call
+
+# Test suite: one file per task domain. Each case is tagged with metadata.domain and
+# metadata.tier (core | extended) so you can select coverage with --filter-metadata.
+tests: file://datasets/*.yaml
