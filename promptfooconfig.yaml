@@ -14,16 +14,52 @@
 description: "LLM cost/speed/quality comparison across task domains"
 
 providers:
-  - id: anthropic:messages:claude-opus-4-8
-    config:
-      max_tokens: 4096        # headroom so code/reasoning answers aren't truncated
-      # thinking: { type: adaptive }   # optional: enable adaptive thinking (Opus 4.8)
-  - id: anthropic:messages:claude-haiku-4-5
-    config:
-      max_tokens: 4096
+  # - id: anthropic:messages:claude-opus-4-8
+  #   config:
+  #     max_tokens: 4096        # headroom so code/reasoning answers aren't truncated
+  #     # thinking: { type: adaptive }   # optional: enable adaptive thinking (Opus 4.8)
+
+  # - id: anthropic:messages:claude-haiku-4-5
+  #   config:
+  #     max_tokens: 4096
+  
   # - id: openai:gpt-4o       # uncomment if OPENAI_API_KEY is set (3rd model, another provider)
   #   config:
   #     max_tokens: 4096
+
+  # --- APIs ---
+  # OpenRouter (Requires OPENROUTER_API_KEY in .env)
+  # - id: openrouter:anthropic/claude-3-opus
+  #   config:
+  #     max_tokens: 4096
+
+  # KiloGateway (Requires KILOGATEWAY_API_KEY in .env)
+  # - id: openai:chat:model-name-here
+  #   config:
+  #     apiBaseUrl: https://api.kilogateway.com/v1
+  #     apiKeyEnvar: KILOGATEWAY_API_KEY
+  #     max_tokens: 4096
+
+  # --- CLI Tools (via the exec provider) ---
+  # Note: adjust the CLI arguments to match how the tool expects to receive the prompt.
+  
+  # Codex CLI
+  - id: exec:./run-codex.sh
+
+  # Antigravity CLI (agy)
+  - id: exec:./run-agy.sh
+
+  # Claude CLI
+  # - id: exec:./run-claude.sh
+  # OpenCode CLI
+  # - id: exec:opencode
+  #   config:
+  #     command: "opencode eval '{{prompt}}'"
+
+  # KiloCode CLI
+  # - id: exec:kilocode
+  #   config:
+  #     command: "kilocode run '{{prompt}}'"
 
 # The same prompt is sent verbatim to every provider — apples-to-apples. Each test case puts its
 # full instruction in the `question` var (so passages/context are self-contained per case).
@@ -35,15 +71,15 @@ defaultTest:
   # Blind, swappable LLM-as-judge: llm-rubric assertions are graded by this model. The grader
   # sees only the output + rubric — never which provider produced the answer. Switch to
   # anthropic:messages:claude-haiku-4-5 to cut judge cost on large runs.
+  # options:
+  #   provider: anthropic:messages:claude-opus-4-8
   options:
-    provider: anthropic:messages:claude-opus-4-8
+    provider: exec:./run-claude.sh
   assert:
     # Surface speed and cost on every cell. Thresholds are generous so they inform rather than
     # fail the run; tighten them to turn cost/latency into hard gates.
     - type: latency
       threshold: 60000        # milliseconds
-    - type: cost
-      threshold: 1.0          # US dollars per call
 
 # Test suite: one file per task domain. Each case is tagged with metadata.domain and
 # metadata.tier (core | extended) so you can select coverage with --filter-metadata.

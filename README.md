@@ -125,9 +125,11 @@ Edit `promptfooconfig.yaml`, uncomment the OpenAI provider, and add its key to `
 OPENAI_API_KEY=sk-...
 ```
 
-promptfoo supports 60+ providers (OpenAI, Google/Gemini, Hugging Face, local/OpenAI-compatible
-servers like GLM, Sakana, vLLM, Ollama) plus custom provider plugins — so adding a model is a
-config change, not a rewrite.
+promptfoo supports 60+ providers natively. We have included templates in `promptfooconfig.yaml` for:
+- **APIs**: OpenRouter and KiloGateway (using the OpenAI-compatible setup).
+- **CLI Tools**: Codex CLI, Antigravity CLI, Claude CLI, OpenCode CLI, KiloCode CLI (using the `exec:` provider).
+
+To use these, simply uncomment them in `promptfooconfig.yaml`, fill in any API keys in `.env`, and adjust the CLI flags if needed. Adding a model or tool is just a configuration change, not a rewrite.
 
 ## Not yet built (next steps)
 
