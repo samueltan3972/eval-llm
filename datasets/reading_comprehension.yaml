@@ -1,59 +1,68 @@
 # Reading comprehension — passage embedded in the question; extractive + inferential.
-- description: "rc: extractive fact"
+
+- description: "Extractive with distractors — identify Asia-Pacific engineering hub city"
   vars:
     question: |
-      Read the passage and answer the question.
+      Read the following passage and answer the question below.
 
-      Passage: "The Amazon rainforest produces roughly 20% of the world's oxygen and is home
-      to about 10% of the known species on Earth. It spans nine countries, with the majority
-      of its area located in Brazil."
+      Meridian Technologies was founded in Austin, Texas in 2009 by former semiconductor engineers who wanted to build next-generation IoT infrastructure. The company grew steadily and opened its first international office in London in 2013, where a dedicated team focused on European sales and channel partnerships. Three years later, in 2016, Meridian expanded into the Asia-Pacific region by opening a Singapore office that served as the company's primary engineering hub for hardware prototyping and firmware development across the APAC market. In 2018, the company launched a Toronto office staffed with machine-learning researchers to spearhead its AI research division. Most recently, Meridian opened a Berlin office in 2020, assembling a specialized group concentrating on privacy and compliance to navigate Europe's evolving regulatory landscape. Today Meridian employs over 2,500 people across five countries.
 
-      Question: Which single country contains the majority of the Amazon rainforest's area?
-      Reply with only the country name.
+      Question: In which city did Meridian Technologies establish its Asia-Pacific engineering hub? Reply with only the city name.
   assert:
     - type: icontains
-      value: "Brazil"
+      value: "Singapore"
   metadata: { domain: reading_comprehension, tier: core }
 
-- description: "rc: numeric extraction"
+- description: "Numeric reasoning — calculate enrollment decline from passage"
   vars:
     question: |
-      Read the passage and answer the question.
+      Read the following passage and answer the question below.
 
-      Passage: "The library opened in 1923 with 4,000 books. By 1950 the collection had grown
-      to 28,000 books, and a second wing was added in 1968."
+      The Greenfield Unified School District released its annual report for the 2023 academic year. In 2019, total enrollment across the district's 14 schools stood at 12,400 students. By 2023, that figure had fallen to 11,650 students, reflecting a broader demographic shift in the region. Despite the decline, the district maintained an operating budget of $48 million and retained 820 full-time teachers, resulting in a student-teacher ratio of roughly 14:1. Superintendent Laura Chen noted that the district plans to consolidate two elementary campuses and redirect savings toward STEM enrichment programs.
 
-      Question: How many books did the library have when it opened? Reply with only the number.
+      Question: By how many students did enrollment decline between 2019 and 2023? Reply with only the number.
   assert:
     - type: contains
-      value: "4,000"
+      value: "750"
   metadata: { domain: reading_comprehension, tier: core }
 
-- description: "rc: inferential"
+- description: "Inferential — what weekly check-ins suggest about confidence in junior engineer"
   vars:
     question: |
-      Read the passage and answer the question.
+      Read the following passage and answer the question below.
 
-      Passage: "Maria packed an umbrella, checked the forecast one more time, and sighed as she
-      cancelled the picnic she had spent all week planning."
+      David, a senior engineering manager at Presto Software, recently reorganized his team to pursue a strategic pivot. He moved two senior engineers, Rina and Marco, off the company's profitable legacy billing platform and reassigned them to a risky new real-time analytics initiative. To fill the leadership gap on the legacy product, David promoted Kayla, a junior engineer who had been on the team for just over a year. Recognizing the weight of the transition, David scheduled weekly one-on-one check-ins with Kayla to review progress, discuss blockers, and provide guidance as she settled into the lead role.
 
-      Question: Why did Maria most likely cancel the picnic? Answer in one short sentence.
+      Question: What does David's decision to schedule weekly check-ins suggest about his confidence in the junior engineer's readiness? Answer in one or two sentences.
   assert:
     - type: llm-rubric
-      value: "Infers that bad/rainy weather (per the forecast and the umbrella) is the reason, rather than restating unrelated details."
-  metadata: { domain: reading_comprehension, tier: extended }
+      value: "The answer should infer that David has some reservations or concerns about the junior engineer's readiness, since the weekly check-ins suggest he feels the junior needs closer oversight or support during the transition, rather than full confidence."
+  metadata: { domain: reading_comprehension, tier: core }
 
-- description: "rc: no-answer-in-text (faithfulness within RC)"
+- description: "Synthesize from two paragraphs — tension between council decision and community concerns"
   vars:
     question: |
-      Read the passage and answer the question using ONLY the passage.
+      Read the following passage and answer the question below.
 
-      Passage: "Jupiter is the largest planet in the Solar System and has dozens of moons,
-      the four largest of which were discovered by Galileo in 1610."
+      At its June session, the Maplewood City Council voted 7-2 to approve construction of a new protected cycling lane along Elm Street, allocating a budget of $2.3 million for the project. The lane will stretch 4.6 kilometers from downtown to the riverside park, and the council set a completion target of March 2026. Council members cited increasing cyclist injuries and the city's climate action plan as primary motivations.
 
-      Question: What is the surface temperature of Jupiter? If the passage does not say,
-      reply exactly 'Not stated in the passage.'
+      In community feedback sessions held the following week, residents living on Elm Street raised concerns about the expected loss of roughly 40 on-street parking spaces that would be removed to make room for the lane. Several local shop owners echoed these worries, stating that reduced foot traffic during the months of construction could hurt their revenue during the busy spring season. A petition signed by 310 residents requested that the council explore alternative routes or provide temporary parking solutions before breaking ground.
+
+      Question: What is the main tension between the council's decision and the community's concerns? Answer in two or three sentences.
+  assert:
+    - type: llm-rubric
+      value: "The answer should synthesize information from both paragraphs: the council approved the cycling lane, but residents and shop owners are concerned about parking loss and construction disruption. A good answer connects the decision to the specific objections rather than speaking generically."
+  metadata: { domain: reading_comprehension, tier: extended }
+
+- description: "Counter-to-common-knowledge — coffee before bed and sleep onset"
+  vars:
+    question: |
+      Read the following passage and answer the question below.
+
+      A 2024 study conducted at the Lindström Sleep Research Institute in Gothenburg examined the effects of moderate coffee consumption on sleep onset. In a controlled trial involving 240 adult participants, researchers found that those who drank a standard cup of coffee thirty minutes before bed fell asleep an average of 12 minutes faster than the control group, who consumed a decaffeinated placebo. Additionally, the coffee group reported higher subjective sleep quality scores, averaging 7.8 on a 10-point scale compared to 6.9 for the control group. The researchers hypothesized that a ritualistic warm-beverage routine may trigger psychological relaxation cues that, for some individuals, outweigh caffeine's stimulant properties.
+
+      Question: According to the passage, did participants who drank coffee before bed fall asleep faster or slower than the control group? Reply with only 'faster' or 'slower'.
   assert:
     - type: icontains
-      value: "Not stated in the passage"
+      value: "faster"
   metadata: { domain: reading_comprehension, tier: extended }

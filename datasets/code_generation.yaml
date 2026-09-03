@@ -1,84 +1,94 @@
 # Code generation — the javascript assertion actually executes the generated function.
 # Each prompt asks for a single named JS function; the assertion strips any code fences,
 # instantiates the function, and runs real test inputs against expected outputs.
-- description: "codegen: add(a, b)"
+- description: "codegen: binarySearch(arr, target)"
   vars:
-    question: "Write a JavaScript function named `add` that takes two numbers and returns their sum. Return only the function definition (a code block is fine)."
+    question: "Write a JavaScript function named `binarySearch` that takes a sorted array of numbers and a target number, and returns the index of the target in the array, or -1 if not found. Use the binary search algorithm (not linear scan). Return only the function definition."
   assert:
     - type: javascript
       value: |
         const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
         const code = (m ? m[1] : output).trim();
         let fn;
-        try { fn = new Function(code + "\nreturn typeof add === 'function' ? add : null;")(); }
+        try { fn = new Function(code + "\nreturn typeof binarySearch === 'function' ? binarySearch : null;")(); }
         catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
-        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `add` not found' };
-        const ok = fn(2,3) === 5 && fn(-1,1) === 0 && fn(0,0) === 0;
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `binarySearch` not found' };
+        const ok = fn([1,3,5,7,9], 5) === 2 && fn([1,3,5,7,9], 4) === -1 && fn([], 1) === -1 && fn([1], 1) === 0;
         return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
     - type: llm-rubric
-      value: "The function is clean and correct JavaScript for adding two numbers."
+      value: "The function implements a correct binary search using iterative or recursive halving of the search space, not a linear scan or indexOf call."
   metadata: { domain: code_generation, tier: core }
 
-- description: "codegen: isPalindrome(s)"
+- description: "codegen: deepFlatten(arr)"
   vars:
-    question: "Write a JavaScript function named `isPalindrome` that returns true if a string reads the same forwards and backwards (case-insensitive, ignoring non-alphanumeric characters), else false. Return only the function definition."
+    question: "Write a JavaScript function named `deepFlatten` that takes an arbitrarily nested array of values and returns a new flat array with all values in order. For example, `deepFlatten([1,[2,[3,[4]]],5])` returns `[1,2,3,4,5]`. Do not use `Array.prototype.flat`. Return only the function definition."
   assert:
     - type: javascript
       value: |
         const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
         const code = (m ? m[1] : output).trim();
         let fn;
-        try { fn = new Function(code + "\nreturn typeof isPalindrome === 'function' ? isPalindrome : null;")(); }
+        try { fn = new Function(code + "\nreturn typeof deepFlatten === 'function' ? deepFlatten : null;")(); }
         catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
-        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `isPalindrome` not found' };
-        const ok = fn('racecar') === true && fn('A man, a plan, a canal: Panama') === true && fn('hello') === false;
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `deepFlatten` not found' };
+        const ok = JSON.stringify(fn([1,[2,[3,[4]]],5])) === '[1,2,3,4,5]' && JSON.stringify(fn([])) === '[]' && JSON.stringify(fn([[1,2],[3]])) === '[1,2,3]';
         return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
+    - type: llm-rubric
+      value: "The function correctly recursively flattens nested arrays without using Array.prototype.flat, handling arbitrary nesting depth."
   metadata: { domain: code_generation, tier: core }
 
-- description: "codegen: fizzbuzz(n)"
+- description: "codegen: memoize(fn)"
   vars:
-    question: "Write a JavaScript function named `fizzbuzz` that, given a single integer n, returns the string 'Fizz' if n is divisible by 3, 'Buzz' if divisible by 5, 'FizzBuzz' if divisible by both, otherwise the number as a string. Return only the function definition."
+    question: "Write a JavaScript function named `memoize` that takes a function `fn` as its argument and returns a new function that caches results. The cache key should be the first argument passed to the memoized function. Subsequent calls with the same first argument should return the cached result without calling `fn` again. Return only the function definition."
   assert:
     - type: javascript
       value: |
         const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
         const code = (m ? m[1] : output).trim();
         let fn;
-        try { fn = new Function(code + "\nreturn typeof fizzbuzz === 'function' ? fizzbuzz : null;")(); }
+        try { fn = new Function(code + "\nreturn typeof memoize === 'function' ? memoize : null;")(); }
         catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
-        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `fizzbuzz` not found' };
-        const ok = fn(3) === 'Fizz' && fn(5) === 'Buzz' && fn(15) === 'FizzBuzz' && String(fn(7)) === '7';
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `memoize` not found' };
+        let calls = 0;
+        const f = fn(function(x) { calls++; return x * 2; });
+        const r1 = f(5) === 10;
+        const r2 = f(5) === 10;
+        const ok1 = r1 && r2 && calls === 1;
+        f(3);
+        const ok2 = calls === 2;
+        const ok = ok1 && ok2;
+        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output: memoization not working as expected' };
+  metadata: { domain: code_generation, tier: extended }
+
+- description: "codegen: groupBy(arr, keyFn)"
+  vars:
+    question: "Write a JavaScript function named `groupBy` that takes an array and a key function, and returns an object whose keys are the results of applying the key function to each element, and whose values are arrays of elements that produced that key. For example, `groupBy([1,2,3,4,5,6], n => n % 2 === 0 ? 'even' : 'odd')` returns `{ odd: [1,3,5], even: [2,4,6] }`. Return only the function definition."
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+        const code = (m ? m[1] : output).trim();
+        let fn;
+        try { fn = new Function(code + "\nreturn typeof groupBy === 'function' ? groupBy : null;")(); }
+        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `groupBy` not found' };
+        const r = fn([1,2,3,4,5,6], n => n % 2 === 0 ? 'even' : 'odd');
+        const ok = JSON.stringify(r['odd']) === '[1,3,5]' && JSON.stringify(r['even']) === '[2,4,6]';
         return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
   metadata: { domain: code_generation, tier: extended }
 
-- description: "codegen: factorial(n)"
+- description: "codegen: pipe(...fns)"
   vars:
-    question: "Write a JavaScript function named `factorial` that returns n! for a non-negative integer n (factorial(0) === 1). Return only the function definition."
+    question: "Write a JavaScript function named `pipe` that takes any number of functions as arguments and returns a new function that applies them left-to-right (i.e., the output of each function is passed as input to the next). For example, `pipe(x => x + 1, x => x * 2)(3)` should return `8`. Return only the function definition."
   assert:
     - type: javascript
       value: |
         const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
         const code = (m ? m[1] : output).trim();
         let fn;
-        try { fn = new Function(code + "\nreturn typeof factorial === 'function' ? factorial : null;")(); }
+        try { fn = new Function(code + "\nreturn typeof pipe === 'function' ? pipe : null;")(); }
         catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
-        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `factorial` not found' };
-        const ok = fn(0) === 1 && fn(1) === 1 && fn(5) === 120;
-        return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
-  metadata: { domain: code_generation, tier: extended }
-
-- description: "codegen: sumArray(arr)"
-  vars:
-    question: "Write a JavaScript function named `sumArray` that returns the sum of all numbers in an array (returns 0 for an empty array). Return only the function definition."
-  assert:
-    - type: javascript
-      value: |
-        const m = output.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
-        const code = (m ? m[1] : output).trim();
-        let fn;
-        try { fn = new Function(code + "\nreturn typeof sumArray === 'function' ? sumArray : null;")(); }
-        catch (e) { return { pass:false, score:0, reason:'syntax error: ' + e.message }; }
-        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `sumArray` not found' };
-        const ok = fn([1,2,3]) === 6 && fn([]) === 0 && fn([-5,5]) === 0;
+        if (typeof fn !== 'function') return { pass:false, score:0, reason:'function `pipe` not found' };
+        const ok = fn(x => x + 1, x => x * 2)(3) === 8 && fn(x => x.toUpperCase())('hello') === 'HELLO';
         return { pass: ok, score: ok?1:0, reason: ok ? 'executes correctly' : 'wrong output' };
   metadata: { domain: code_generation, tier: extended }

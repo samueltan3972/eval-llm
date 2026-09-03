@@ -1,61 +1,57 @@
 # Summarization — LLM-judge for quality + javascript for length/format constraints.
-- description: "summarize: under 25 words"
+
+- description: "Word-limit summary of a multi-topic city news passage (≤30 words)"
   vars:
     question: |
-      Summarize the following in no more than 25 words. Reply with only the summary.
-      Text: "Promptfoo is an open-source tool that runs the same set of tests across many large
-      language models and providers, then reports each model's cost, latency, and output quality
-      side by side so teams can choose the best model for their use case."
+      Summarize the following passage in no more than 30 words. Reply with only the summary.
+
+      Harrowfield celebrated the opening of its new light-rail system this spring, a project that came in twelve percent under budget after three years of construction. Meanwhile, city council approved the controversial rezoning of the waterfront district, converting former industrial lots into mixed-use developments that blend residential towers with retail and public green space. The decision drew both praise from developers and protests from heritage preservation groups. On the tourism front, Harrowfield recorded a record-breaking summer season, welcoming 1.2 million visitors who contributed an estimated $310 million to the local economy. Not all news was bright, however. Pages & Co., the city's oldest independent bookshop, closed its doors after 87 years, citing unsustainable lease increases. Housing affordability remains a pressing concern as well: the latest census data shows median monthly rent has climbed above $2,100, a 17 percent jump from just two years ago, squeezing middle-income families out of central neighborhoods.
   assert:
     - type: javascript
       value: |
-        return output.trim().split(/\s+/).filter(Boolean).length <= 25;
+        return output.trim().split(/\s+/).filter(Boolean).length <= 30;
     - type: llm-rubric
-      value: "Accurately captures that promptfoo benchmarks many LLMs on cost, latency, and quality. Faithful, no invented facts."
+      value: "The summary captures the most important developments in Harrowfield (light-rail, waterfront rezoning, tourism boom, housing costs) within the word limit. It is faithful and does not invent facts."
   metadata: { domain: summarization, tier: core }
 
-- description: "summarize: single sentence"
+- description: "Single-sentence summary of a nuanced pharmaceutical trial decision"
   vars:
     question: |
       Summarize the following in exactly one sentence. Reply with only the sentence.
-      Text: "The committee met for three hours, debated five proposals, rejected two on budget
-      grounds, deferred one for legal review, and approved the remaining two for a pilot launch
-      next quarter."
+
+      Veltrix Pharma announced last week that it would discontinue development of VX-114, its experimental Alzheimer's treatment, following Phase II trial results. The trial showed a modest 14 percent cognitive improvement over placebo on the study's primary endpoint, falling short of the pre-specified threshold for advancement. However, the drug demonstrated an unexpectedly favorable safety profile, with adverse-event rates nearly identical to placebo across all dosage groups. Several independent neurologists have since argued that the trial's endpoints were overly conservative and that VX-114 deserved a Phase III trial with revised, clinically meaningful measures. Veltrix's chief medical officer defended the decision, stating that the company must allocate resources to programs with clearer efficacy signals, though she acknowledged the safety data was "genuinely encouraging."
   assert:
     - type: javascript
       value: |
-        // At most one sentence-ending punctuation mark (allow a single trailing one).
+        // Allow at most one sentence-ending punctuation mark
         const ends = (output.trim().match(/[.!?]/g) || []).length;
         return ends <= 1;
     - type: llm-rubric
-      value: "One sentence that faithfully conveys the key outcome (two proposals approved for a pilot), without contradicting the text."
+      value: "One sentence that captures the core tension: Veltrix discontinued VX-114 despite favorable safety data because efficacy was modest, and some researchers disagree with that decision. Faithful to the passage."
   metadata: { domain: summarization, tier: core }
 
-- description: "summarize: TL;DR of a longer passage"
+- description: "Fact vs. opinion distinction in a remote-work summary"
   vars:
     question: |
-      Give a 2-3 sentence TL;DR of the passage. Reply with only the TL;DR.
-      Passage: "Electric vehicles have grown rapidly, but charging infrastructure has lagged in
-      rural areas. Governments are offering subsidies to install fast chargers along highways.
-      Critics argue the grid needs upgrades first, while supporters say demand will drive
-      investment. Several pilot programs launched this year aim to test both approaches."
+      Summarize the following passage, clearly distinguishing between factual findings and opinions or arguments. Reply with only the summary.
+
+      The debate over remote work continues to intensify. A 2024 Stanford study found that remote workers were 13 percent more productive than their in-office counterparts, measured by output per hour across a sample of 2,400 employees. Companies that adopted hybrid policies reported 22 percent lower office-related costs, according to a survey by the Global Workplace Institute. Meanwhile, 68 percent of employees said they preferred at least two remote days per week in a Gallup poll released this January. Critics, however, argue that remote work erodes company culture and weakens the informal mentorship that happens in hallways and break rooms. Proponents counter that flexible arrangements democratize opportunity, particularly for workers in rural areas who previously had limited access to high-paying jobs. One prominent CEO went so far as to call mandatory return-to-office mandates "a failure of imagination," sparking a heated exchange on social media that underscored just how polarized the conversation has become.
   assert:
     - type: llm-rubric
-      value: "Concise (about 2-3 sentences) and faithfully captures EV growth, lagging rural charging, subsidies, and the grid-upgrade debate. No fabricated details."
+      value: "The summary clearly separates or labels factual data (the Stanford study's 13% productivity gain, 22% lower office costs, 68% employee preference) from opinions and arguments (culture erosion concerns, democratization argument, CEO quote). Mislabeling a fact as opinion or vice versa is a failure."
   metadata: { domain: summarization, tier: extended }
 
-- description: "summarize: as three bullet points"
+- description: "Exactly 3 bullet points from a nonprofit annual report with 7 accomplishments"
   vars:
     question: |
-      Summarize the following as exactly three bullet points, each starting with '- '.
-      Reply with only the bullets.
-      Text: "The new app release improves startup time by 40%, adds dark mode, and fixes a
-      sync bug that affected offline edits. It also drops support for the oldest OS version."
+      Summarize the following passage as exactly three bullet points, each starting with '- '. Pick the three most impactful accomplishments. Reply with only the bullets.
+
+      GreenPath Alliance released its 2024 annual report this month, highlighting a year of ambitious growth and measurable impact. The organization planted 340,000 trees across 12 countries, expanding its reforestation footprint into Southeast Asia for the first time. It also trained 8,500 local farmers in sustainable agriculture techniques, including crop rotation, composting, and integrated pest management. In its ongoing fight against pollution, GreenPath helped partner communities reduce plastic waste by 31 percent through collection programs and recycled-material marketplaces. Education remained a priority as well: the alliance launched a scholarship program funding 200 students pursuing degrees in environmental science at universities in seven nations. On the research front, GreenPath opened a new laboratory in Nairobi dedicated to developing drought-resistant crop varieties for East African climates. Financial momentum was equally strong, with the organization securing $47 million in new multi-year funding from three sovereign wealth funds committed to climate resilience. Finally, GreenPath's research team published a peer-reviewed study on soil carbon sequestration that has already been cited by policymakers drafting new agricultural subsidy frameworks.
   assert:
     - type: javascript
       value: |
         const bullets = output.split('\n').filter(l => l.trim().startsWith('-'));
         return bullets.length === 3;
     - type: llm-rubric
-      value: "Three bullets that faithfully reflect the release notes (faster startup, dark mode, sync fix; dropping old OS support is acceptable as a point)."
+      value: "Exactly three bullets that select the most significant accomplishments from the report. Each bullet is faithful to the passage. The selection demonstrates reasonable prioritization (e.g., the tree planting scale, funding secured, or farmer training are strong candidates)."
   metadata: { domain: summarization, tier: extended }

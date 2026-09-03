@@ -1,54 +1,133 @@
 # Long-context retrieval — needle-in-a-haystack. One fact is buried in a long passage.
 # Marked 'extended' only (high token cost); excluded from the core run by default.
-- description: "longctx: retrieve buried passcode"
+
+- description: "Long-context retrieval: find the internal codename for the robotics project in an 800-word quarterly business report"
   vars:
     question: |
-      Read the following document carefully, then answer the question at the very end.
+      Read the following quarterly business report carefully, then answer the question at the end.
 
-      DOCUMENT:
-      The quarterly operations review covered many routine topics. Facilities reported that the
-      north parking lot would be resurfaced in stages to minimize disruption. The cafeteria
-      vendor contract was renewed for another year with a minor menu refresh. IT noted that
-      laptop refresh cycles would move from three years to four to reduce e-waste. The travel
-      policy was clarified: economy fares for flights under four hours, with manager approval
-      required for any upgrade. The wellness committee announced two new lunchtime yoga slots.
-      Procurement reminded everyone to submit purchase requests at least ten business days in
-      advance. The security team rotated the visitor Wi-Fi password; the new guest network
-      passphrase is "river-otter-2291" and should be shared only with escorted visitors.
-      Marketing previewed the autumn campaign, emphasizing sustainability messaging. HR reminded
-      staff that open enrollment closes at the end of the month. The finance team flagged that
-      expense reports older than ninety days would no longer be reimbursed. Engineering shared a
-      roadmap update with three milestones slated before year end. The office manager noted that
-      the printers on the third floor had been serviced. Finally, the meeting closed with a
-      reminder about the all-hands scheduled for the following Thursday.
+      ---
 
-      QUESTION: What is the new guest network passphrase mentioned in the document? Reply with
-      only the passphrase.
+      HELIOS INDUSTRIAL GROUP — THIRD QUARTER BUSINESS REVIEW
+
+      Helios Industrial Group is pleased to report strong financial performance for the third quarter of fiscal year 2025. Consolidated revenue reached $142 million, reflecting an 8 percent year-over-year increase driven by robust demand across our core verticals of advanced manufacturing, logistics automation, and industrial IoT solutions. Gross margin improved to 41.3 percent, up from 39.7 percent in the prior-year quarter, as cost-optimization initiatives and favorable product mix offset modest increases in raw-material pricing. Operating expenses totaled $38.6 million, in line with our plan to invest in growth while maintaining disciplined cost controls. EBITDA for the quarter was $24.1 million, and diluted earnings per share came in at $0.87. Company-wide headcount stood at 3,214 full-time employees at quarter end, a net addition of 127 positions compared with Q2, predominantly in engineering and field services.
+
+      Sales performance across our three geographic segments was broadly encouraging. The Americas region contributed $78.4 million in revenue, anchored by a multi-year contract extension with Continental Freight Systems valued at approximately $18 million. EMEA revenue totaled $38.9 million, boosted by new installations for two major automotive OEMs in Germany and a significant expansion deal with a UK-based third-party logistics provider. The APAC region delivered $24.7 million, a 14 percent sequential gain attributable to increased adoption of our conveyor-intelligence platform in Southeast Asian e-commerce fulfillment centers. Notable pipeline additions include a shortlisted opportunity with a Middle Eastern sovereign wealth fund's logistics subsidiary and a proof-of-concept engagement with a top-five North American retailer exploring micro-fulfillment strategies.
+
+      On the product development front, the team shipped three major feature releases during the quarter. Our flagship HeliosOS platform received real-time anomaly detection powered by on-device machine-learning inference, reducing unplanned downtime alerts by 22 percent in early adopter deployments. The Vantage Analytics module introduced a customizable KPI dashboard that has already been activated by over 160 enterprise accounts. Additionally, we released the HeliosMobile companion app for iOS and Android, enabling field technicians to monitor equipment health, acknowledge alarms, and initiate remote diagnostics from any location. Customer feedback themes centered on requests for deeper ERP integration, multi-language support for the analytics interface, and enhanced role-based access controls, all of which are now on the H1 roadmap.
+
+      Operations and supply chain management continued to improve in Q3. Average lead time for our standard product configurations decreased from 6.8 weeks to 5.3 weeks, a 22 percent reduction achieved through vendor consolidation and strategic pre-positioning of critical components. We completed the rationalization of our supplier base, moving from 312 active vendors to 245, which has simplified procurement workflows and strengthened our negotiating leverage. The new 185,000-square-foot distribution center in Reno, Nevada, became fully operational in August, providing regional redundancy and enabling two-day ground shipping coverage to 90 percent of the western United States. Inventory turns improved to 5.1 times annualized, up from 4.6 in Q2, reflecting better demand-planning accuracy.
+
+      Research and development expenditures totaled $12.7 million for the quarter, representing 8.9 percent of revenue and underscoring our commitment to innovation leadership. The computer-vision team completed validation testing of its next-generation pallet-identification module, which achieved 99.4 percent accuracy across a dataset of 1.2 million images under varying lighting and occlusion conditions. Our embedded-systems group is finalizing firmware for the Mark IV sensor array, targeting a January release that will double the sampling frequency while cutting power consumption by 30 percent. The advanced robotics division has begun prototyping under the internal codename Project Tanager, which aims to deliver a fully autonomous warehouse picking system by Q2 of next year. In parallel, the AI and machine-learning center of excellence published two peer-reviewed papers on reinforcement-learning-based path planning and secured a collaborative research grant with the Georgia Institute of Technology. The quantum-sensing exploratory team also completed its Phase 1 feasibility study and has recommended proceeding to laboratory-scale testing.
+
+      Human resources metrics remained healthy throughout the quarter. Voluntary attrition held steady at 7.2 percent on an annualized basis, well below the industry average of approximately 12 percent. We extended 184 new offers during the period, achieving a 91 percent acceptance rate, and reduced average time-to-fill for engineering roles from 48 days to 39 days through expanded university partnerships and an improved referral bonus program. Our learning and development team launched a new Technical Leadership Academy designed to accelerate the growth of mid-career engineers into principal and staff-level roles, with the inaugural cohort of 32 participants beginning in October. Diversity, equity, and inclusion efforts advanced with the introduction of sponsorship circles pairing senior leaders with high-potential employees from underrepresented groups, and our latest engagement survey showed a four-point improvement in the inclusion index.
+
+      Looking ahead to the fourth quarter, management is providing revenue guidance in the range of $148 million to $153 million, implying full-year revenue of approximately $555 million at the midpoint. Capital expenditure for the full fiscal year is now expected to total $34 million, reflecting the Reno facility buildout and incremental investment in test-lab infrastructure at our Zurich innovation center. Net debt stood at $62 million at the end of Q3, and we maintain $110 million of undrawn capacity on our revolving credit facility, providing ample liquidity for both organic growth and selective tuck-in acquisitions. We continue to evaluate two to three potential acquisition targets in the collaborative-robotics and warehouse-simulation software spaces.
+
+      In closing, the executive team extends its gratitude to our shareholders, customers, and employees for their continued commitment to the Helios mission of making industrial operations safer, smarter, and more sustainable. The Board of Directors has reaffirmed the company's strategic priorities: accelerating recurring-revenue growth, expanding our international footprint, and deepening our technology moat through sustained R&D investment. We look forward to updating stakeholders at our annual investor day in December.
+
+      ---
+
+      What is the internal codename for the advanced robotics division's autonomous warehouse picking system? Reply with only the codename.
   assert:
     - type: contains
-      value: "river-otter-2291"
+      value: "Project Tanager"
   metadata: { domain: long_context_retrieval, tier: extended }
 
-- description: "longctx: retrieve buried detail in a bio"
+- description: "Long-context retrieval: find the current stable release version in an 800-word API technical specification"
   vars:
     question: |
-      Read the following biography carefully, then answer the question at the very end.
+      Read the following technical specification document carefully, then answer the question at the end.
 
-      BIOGRAPHY:
-      Dr. Helena Vasquez began her career as a marine biologist studying coral reef resilience
-      in the Pacific. After completing her doctorate, she spent several years aboard research
-      vessels cataloguing deep-sea species. She later pivoted to science communication, hosting
-      a popular documentary series and writing three best-selling books on ocean ecosystems.
-      In 2014 she founded the Blue Horizon Institute, a nonprofit focused on coastal
-      conservation and community education. She has advised several governments on marine
-      protected areas, received numerous awards for public engagement, and mentored dozens of
-      early-career scientists. Outside of work she is an avid long-distance swimmer and an
-      amateur astronomer. Her favorite research site remains a remote atoll she first visited
-      as a graduate student.
+      ---
 
-      QUESTION: In what year did Dr. Vasquez found the Blue Horizon Institute? Reply with only
-      the year.
+      NOVABRIDGE API PLATFORM — TECHNICAL SPECIFICATION
+
+      1. Overview
+
+      NovaBridge is a unified API gateway and integration platform designed to simplify connectivity between enterprise systems, cloud-native microservices, and third-party SaaS applications. It targets backend engineers, platform teams, and integration architects who need a reliable, high-throughput conduit for synchronous and asynchronous communication. NovaBridge supports three primary protocols — REST over HTTPS, GraphQL with subscription support, and gRPC with bidirectional streaming — allowing consumers to choose the interaction style that best fits their use case. The platform is protocol-agnostic at the transport layer, meaning a single logical API can be exposed simultaneously across all three protocols without duplicating business logic.
+
+      2. Architecture
+
+      NovaBridge follows a modular microservices architecture deployed on Kubernetes. The core gateway component handles request routing, protocol translation, and payload transformation. Behind the gateway sits a set of domain services — identity, catalog, billing, and telemetry — each independently deployable and horizontally scalable. Inter-service communication is mediated by Apache Kafka, configured with topic-level partitioning and consumer-group isolation to guarantee ordered delivery within logical streams while allowing parallel consumption. A service mesh built on Envoy proxies provides mTLS encryption, circuit breaking, and fine-grained traffic control between services. All components are packaged as OCI-compliant container images and orchestrated via Helm charts, enabling consistent deployment across development, staging, and production clusters.
+
+      3. Authentication and Authorization
+
+      NovaBridge implements OAuth 2.0 as the primary authentication framework, supporting the authorization-code, client-credentials, and device-authorization grant types. Short-lived JSON Web Tokens are issued by the platform's identity service, signed with RS256, and validated at the gateway before any downstream processing occurs. API keys are available as an alternative authentication mechanism for machine-to-machine integrations and are scoped to specific namespaces and permission sets. Token rotation is enforced automatically: access tokens expire after 15 minutes, and refresh tokens are valid for 7 days with absolute expiration after 30 days. Key rotation for signing certificates follows a 90-day schedule, with dual-key overlap windows to prevent service interruption during rollover.
+
+      4. Rate Limiting and Throttling
+
+      To protect platform stability and ensure fair resource allocation, NovaBridge enforces tiered rate limits at the organization level. The Free tier permits 100 requests per minute with a burst allowance of 20 additional requests over any 10-second window. The Professional tier raises the ceiling to 2,000 requests per minute with a burst allowance of 500. Enterprise customers receive configurable limits negotiated under their service agreement, typically ranging from 10,000 to 50,000 requests per minute. When a client exceeds its allocated rate, the gateway returns an HTTP 429 status code accompanied by a Retry-After header indicating the number of seconds the client should wait before retrying. Throttled requests are not counted against the client's quota, and the platform provides a real-time usage dashboard so teams can monitor consumption and adjust their calling patterns proactively.
+
+      5. Versioning and Compatibility
+
+      NovaBridge follows a date-based major-version scheme combined with semantic minor and patch versions for incremental changes. Major versions are released annually and are supported for a minimum of 24 months after the successor version becomes generally available. Clients specify the desired API version through a custom X-Nova-Version header or as a path prefix, and the gateway routes requests to the appropriate handler. Deprecation notices are published at least six months before a version reaches end-of-life, accompanied by migration guides and automated compatibility-check tooling. The current stable release is v3.8.2-rc1, which includes backward-compatible fixes for the batch ingestion endpoint and improved error codes for the streaming API. Patch releases within a major version are guaranteed to be non-breaking, and the platform maintains a comprehensive changelog accessible via both the developer portal and a machine-readable Atom feed. Integration tests are executed against all supported versions on every deployment to prevent regressions.
+
+      6. Data Formats and Content Negotiation
+
+      NovaBridge supports JSON as the default serialization format for REST and GraphQL interactions, and Protocol Buffers for gRPC endpoints. Clients may request specific formats via the Accept header; unsupported formats return a 406 Not Acceptable response. All JSON payloads conform to published JSON Schema definitions, which are versioned alongside the API and available for download from the schema registry. Server-side validation rejects malformed payloads with descriptive error messages referencing the specific schema constraint that was violated. For high-throughput ingestion scenarios, the platform also accepts newline-delimited JSON and CSV with configurable column mappings.
+
+      7. Monitoring and Observability
+
+      Every NovaBridge component exports Prometheus-compatible metrics on a dedicated /metrics endpoint, covering request counts, latency histograms, error rates, and resource utilization. Distributed tracing is implemented via OpenTelemetry, with trace context propagated automatically across service boundaries. Traces are shipped to a Jaeger backend and retained for 14 days. Alerting is managed through a rule engine that evaluates configurable thresholds — for example, a sustained error rate above 1 percent over a five-minute window triggers a PagerDuty incident. Health-check endpoints at /healthz and /readyz support both liveness and readiness probes, enabling Kubernetes to manage pod lifecycle automatically.
+
+      8. Deployment and Reliability
+
+      NovaBridge's CI/CD pipeline is built on GitHub Actions, with automated linting, unit testing, integration testing, and security scanning executed on every pull request. Deployments follow a blue-green strategy: traffic is shifted to the new version only after automated smoke tests pass in the production environment. Instant rollback is supported by retaining the previous deployment's pods in a warm-standby state for 30 minutes post-cutover. The platform targets a 99.95 percent uptime SLA, backed by multi-region active-active replication and automated failover. Disaster-recovery procedures are tested quarterly, with a recovery-time objective of 15 minutes and a recovery-point objective of zero for stateful components leveraging synchronous replication.
+
+      ---
+
+      What is the current stable release version of NovaBridge? Reply with only the version number.
   assert:
     - type: contains
-      value: "2014"
+      value: "v3.8.2-rc1"
+  metadata: { domain: long_context_retrieval, tier: extended }
+
+- description: "Long-context retrieval: find the vacation day carry-over limit in an 800-word employee handbook excerpt"
+  vars:
+    question: |
+      Read the following employee handbook excerpt carefully, then answer the question at the end.
+
+      ---
+
+      CRESTLINE SOLUTIONS — EMPLOYEE HANDBOOK (EXCERPT)
+
+      1. Welcome and Company Values
+
+      Welcome to Crestline Solutions. Founded in 2009, Crestline Solutions is a technology consulting and software engineering firm dedicated to helping organizations modernize their digital infrastructure. Our mission is to deliver innovative, reliable, and secure solutions that empower our clients to achieve their strategic objectives. We are guided by four core values: integrity in every engagement, excellence in craft, collaboration across boundaries, and a relentless focus on client success. We believe that a strong culture is built on mutual respect, intellectual curiosity, and a shared commitment to continuous improvement. Every employee, regardless of role or tenure, is expected to embody these values in their daily work and interactions.
+
+      2. Working Hours and Flexibility
+
+      Standard business hours at Crestline Solutions are 9:00 AM to 6:00 PM, Monday through Friday, with a one-hour lunch break. However, we recognize that rigid schedules do not suit every role or individual circumstance. Employees in good standing may take advantage of our flex-time policy, which permits shifting start and end times by up to two hours in either direction with manager approval. Our remote work guidelines allow eligible employees to work from home up to three days per week, provided they maintain availability during core collaboration hours of 10:00 AM to 3:00 PM in their local time zone. Fully remote arrangements may be approved on a case-by-case basis for roles that do not require on-site presence. All remote workers are expected to maintain a dedicated, distraction-free workspace and a reliable broadband connection.
+
+      3. Compensation
+
+      Crestline Solutions operates on a semi-monthly pay cycle, with paychecks issued on the 15th and the last business day of each month. All employees are enrolled in direct deposit upon hire, and pay stubs are accessible through our HR portal. Annual compensation reviews take place in March, with adjustments effective April 1. Reviews consider individual performance, market benchmarking data, and company financial performance. Discretionary bonuses are awarded annually based on a combination of individual achievement, team results, and overall company profitability. Employees at the senior level and above are also eligible for a long-term incentive plan tied to company performance milestones over a three-year vesting period.
+
+      4. Health and Wellness
+
+      We offer a comprehensive benefits package designed to support the physical and mental well-being of our employees and their families. Medical coverage includes three plan options — a high-deductible health plan with health savings account, a preferred-provider organization plan, and a health maintenance organization plan — each available at the individual, employee-plus-spouse, and family tiers. Dental and vision coverage is provided at no additional cost for all full-time employees. Mental health resources include access to an employee assistance program offering confidential counseling sessions, a subscription to a digital mindfulness platform, and quarterly wellness workshops facilitated by licensed therapists. Crestline also reimburses up to $600 per year for gym memberships, fitness classes, or home exercise equipment purchases.
+
+      5. Professional Development
+
+      Crestline Solutions is committed to the ongoing growth of its employees. Each full-time employee receives an annual professional development budget of $2,500, which may be applied toward online courses, certification exams, books, and professional association memberships. Employees wishing to attend industry conferences may request additional funding through their department head; approvals are granted based on relevance to current projects and available departmental budget. Our tuition reimbursement program covers up to 80 percent of tuition costs for degree programs at accredited institutions, subject to a lifetime cap of $25,000 and a minimum grade requirement of B or equivalent. Internally, we maintain a knowledge-sharing platform where employees publish technical articles, recorded lunch-and-learn sessions, and curated reading lists.
+
+      6. Paid Time Off
+
+      Crestline Solutions provides a generous paid time off program to help employees maintain a healthy work-life balance. Full-time employees accrue vacation at a rate of 1.25 days per month during their first three years of service, increasing to 1.67 days per month from the fourth year onward. Vacation requests should be submitted through the HR portal at least two weeks in advance for absences of three or more consecutive days, and at least 48 hours in advance for shorter absences. Employees may carry over a maximum of 5 unused vacation days into the next calendar year; any balance beyond five days will be forfeited on January 1. In addition to vacation, employees receive 8 paid sick days per year, which may be used for personal illness, medical appointments, or care of an immediate family member. Crestline also observes 11 company-designated holidays per year, plus one floating personal holiday that employees may use at their discretion. Bereavement leave of up to five days is available for the loss of an immediate family member, and jury duty leave is granted with full pay for the duration of service.
+
+      7. Code of Conduct
+
+      All employees are expected to maintain the highest standards of professional and ethical behavior. Conflicts of interest must be disclosed promptly to your manager and the legal department; examples include outside employment with a competitor, financial interests in a client organization, and personal relationships with vendors. Our social media policy requires employees to identify personal opinions as their own and to refrain from sharing confidential company or client information on any public platform. Confidentiality obligations extend beyond employment and cover proprietary methodologies, client data, pricing structures, and internal strategic plans. Violations of the code of conduct may result in disciplinary action up to and including termination.
+
+      8. Separation and Offboarding
+
+      Employees who choose to resign are asked to provide a minimum of two weeks' written notice, or four weeks for director-level positions and above. During the notice period, the departing employee is expected to complete a knowledge-transfer plan developed in coordination with their manager. An exit interview will be conducted by human resources to gather feedback on the employee's experience and identify areas for organizational improvement. All company-owned equipment — including laptops, monitors, access badges, and mobile devices — must be returned on or before the last day of employment. Health insurance coverage continues through the end of the month in which separation occurs, and departing employees are eligible for COBRA continuation coverage as provided by law.
+
+      ---
+
+      According to the handbook, how many unused vacation days may employees carry over into the next calendar year? Reply with only the number.
+  assert:
+    - type: contains
+      value: "5"
   metadata: { domain: long_context_retrieval, tier: extended }

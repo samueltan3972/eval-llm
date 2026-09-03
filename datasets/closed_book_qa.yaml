@@ -1,40 +1,47 @@
 # Closed-book factual QA — reference-based. Stable facts only (no time-sensitive items).
-- description: "qa: geography capital"
+# Problems target commonly confused facts, multi-hop reasoning, and less obvious knowledge.
+
+- description: "qa: multi-hop geography"
   vars:
-    question: "What is the capital of Australia? Reply with only the city name."
+    question: "What body of water does the Danube River empty into? Reply with only the name."
   assert:
     - type: icontains
-      value: "Canberra"
+      value: "Black Sea"
+  # Multi-hop: must know the Danube's course through central/eastern Europe and its terminus.
   metadata: { domain: closed_book_qa, tier: core }
 
-- description: "qa: science"
+- description: "qa: commonly confused fact (most time zones)"
   vars:
-    question: "What is the chemical symbol for gold? Reply with only the symbol."
-  assert:
-    - type: equals
-      value: "Au"
-  metadata: { domain: closed_book_qa, tier: core }
-
-- description: "qa: history"
-  vars:
-    question: "In what year did the Apollo 11 mission first land humans on the Moon? Reply with only the year."
-  assert:
-    - type: contains
-      value: "1969"
-  metadata: { domain: closed_book_qa, tier: core }
-
-- description: "qa: literature"
-  vars:
-    question: "Who wrote the play 'Romeo and Juliet'? Reply with only the author's name."
+    question: "Which country has the most time zones, including overseas territories? Reply with only the country name."
   assert:
     - type: icontains
-      value: "Shakespeare"
-  metadata: { domain: closed_book_qa, tier: extended }
+      value: "France"
+  # France has 12 time zones (including overseas territories like French Polynesia, New Caledonia, Réunion, etc.). Common wrong answer: Russia (11 time zones) or USA.
+  metadata: { domain: closed_book_qa, tier: core }
 
-- description: "qa: units / science constant"
+- description: "qa: less commonly known scientific fact"
   vars:
-    question: "What is the speed of light in vacuum, rounded to the nearest thousand km/s? Reply with only the number (in km/s)."
+    question: "What is the most abundant gas in Earth's atmosphere by volume? Reply with only the gas name."
+  assert:
+    - type: icontains
+      value: "Nitrogen"
+  # ~78% nitrogen. Common wrong answer: oxygen (~21%). Tests whether model confuses 'most important for breathing' with 'most abundant'.
+  metadata: { domain: closed_book_qa, tier: core }
+
+- description: "qa: distinguishing commonly confused items"
+  vars:
+    question: "What is the largest desert in the world by total area? Reply with only the name."
   assert:
     - type: contains-any
-      value: ["300000", "299792", "300,000", "299,792"]
+      value: ["Antarctic", "Antarctica"]
+  # The Antarctic Desert (~14.2M km²) is the largest. Common wrong answer: Sahara (~9.2M km²), which is the largest *hot* desert.
+  metadata: { domain: closed_book_qa, tier: extended }
+
+- description: "qa: reasoning over world knowledge"
+  vars:
+    question: "Which planet in our solar system has the shortest day (fastest rotation period)? Reply with only the planet name."
+  assert:
+    - type: icontains
+      value: "Jupiter"
+  # Jupiter's rotation period is ~9 hours 56 minutes, the shortest of any planet. Common wrong answer: Saturn (~10.7 hours) or Earth.
   metadata: { domain: closed_book_qa, tier: extended }

@@ -19,26 +19,32 @@
       value: "Correctly identifies that the conclusion does NOT follow (the fading flowers need not be roses)."
   metadata: { domain: logic_reasoning, tier: core }
 
-- description: "reasoning: number sequence"
+- description: "reasoning: knights and knaves deduction"
   vars:
-    question: "What is the next number in the sequence 2, 6, 12, 20, 30, ...? Reply with only the number."
+    question: "On an island, knights always tell the truth and knaves always lie. You meet two people, A and B. A says: 'At least one of us is a knave.' What are A and B? State your answer on the first line as 'A is a [knight/knave], B is a [knight/knave]', then explain your reasoning briefly."
   assert:
-    - type: equals
-      value: "42"
+    - type: regex
+      value: "(?i)A is a knight.*B is a knave"
+    - type: llm-rubric
+      value: "Correctly deduces that A must be a knight and B must be a knave. The reasoning should note: if A were a knave, the statement 'at least one of us is a knave' would be true (since A is a knave), but knaves always lie, contradiction. So A is a knight and the statement is true, meaning at least one is a knave — since A is a knight, B must be the knave."
   metadata: { domain: logic_reasoning, tier: core }
 
-- description: "reasoning: relational ordering"
+- description: "reasoning: counterfactual temporal reasoning"
   vars:
-    question: "Tom is taller than Jerry. Jerry is taller than Spike. Spike is taller than Max. Who is the shortest? Reply with only the name."
+    question: "Alice put a sandwich in the fridge at 9 AM and left for work. Bob came home at noon, ate the sandwich, and left at 1 PM. Alice's coworker Carol stopped by the house at 2 PM to return a book. Carol looked in the fridge. Is the sandwich in the fridge? Explain your reasoning step by step, then give your final answer on the last line as 'Answer: Yes' or 'Answer: No'."
   assert:
-    - type: icontains
-      value: "Max"
+    - type: regex
+      value: "(?i)answer:\\s*no"
+    - type: llm-rubric
+      value: "Correctly tracks the state of the sandwich through time: Alice placed it at 9 AM, Bob ate it at noon, so by 2 PM the sandwich is no longer in the fridge. The model should not be confused by Carol's arrival or the mention of returning a book (distractors)."
   metadata: { domain: logic_reasoning, tier: extended }
 
-- description: "reasoning: commonsense physical"
+- description: "reasoning: invalid syllogism trap (affirming the consequent)"
   vars:
-    question: "You pour a full glass of water into a larger empty pitcher, then back into the same glass. Roughly how full is the glass now? Answer in one short sentence."
+    question: "Consider these premises: (1) All mammals are warm-blooded. (2) A parrot named Polly is warm-blooded. Can we logically conclude that Polly is a mammal? Answer 'Yes' or 'No' on the first line, then explain briefly."
   assert:
+    - type: regex
+      value: "(?i)^\\s*no\\b"
     - type: llm-rubric
-      value: "Indicates the glass is full again (about the same amount of water returns), allowing for trivial spillage. Does not claim it overflows or is half full."
+      value: "Correctly identifies that the conclusion does NOT follow. This is the fallacy of affirming the consequent: all mammals are warm-blooded does not mean all warm-blooded animals are mammals. Parrots (birds) are also warm-blooded. The model should not be tricked into concluding Polly is a mammal."
   metadata: { domain: logic_reasoning, tier: extended }

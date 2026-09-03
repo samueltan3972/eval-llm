@@ -1,0 +1,122 @@
+# Config for the custom benchmark harness:  python -m benchmark run
+#
+# Runs datasets/*.yaml across the models below and reports three 0-100 scores
+# (quality, speed, cost) plus an equal-weighted overall, saved to runs/.
+#
+#   pipenv run python -m benchmark run --dry-run          # no spend, exercises everything
+#   pipenv run python -m benchmark run --filter tier=core --sample 5
+#   pipenv run python -m benchmark run --by-domain
+#   pipenv run python -m benchmark compare runs/<A>.json runs/<B>.json
+#
+# `pricing` is USD per 1,000,000 tokens. For CLI tools we have no real token usage, so tokens
+# are estimated with a tokenizer and cost is therefore ESTIMATED (shown with a ~). Set the
+# prices to whatever the model actually charges so the relative cost ranking is meaningful.
+
+label: models
+
+models:
+  # --- CLI tools (primary path) -------------------------------------------------------
+  # The command can be inlined here (no external .sh wrapper needed). Two forms:
+  #   * simple command: runs WITHOUT a shell; {prompt} is substituted as a single argument.
+  #   * shell: true:    runs via the shell for pipes/redirects/`;`; the prompt is passed in
+  #                     the $PROMPT env var (never interpolated), so it stays injection-safe.
+  #
+  # `name`  = stable internal id/key (used by --models, the cache, and `compare`). Keep it unique.
+  # `model` = the real model being benchmarked; shown in reports as "<model> (<tool>)".
+  # `tool`  = optional label for the driver; defaults to the command's binary (codex, agy, ...).
+
+  - name: codex            # internal id (key)
+    model: GPT-5.5         # <- shown in the leaderboard/report, e.g. "GPT-5.5 (codex)"
+    type: cli
+    shell: true
+    # No temp file: codex's last message streams to our stdout via fd 3 (chatter -> /dev/null).
+    # Race-free per process and keeps file I/O out of the timed path (no speed bias).
+    command: 'codex exec --model gpt-5.5 --ignore-user-config --output-last-message /dev/fd/3 "$PROMPT" 3>&1 >/dev/null 2>&1'
+    pricing: { input: 5.00, output: 30.00 }
+
+  - name: antigravity
+    model: Gemini 3.1 Pro  # -> "Gemini 3.1 Pro (agy)"
+    type: cli
+    command: "agy --model gemini-3.1-pro --prompt {prompt}"
+    pricing: { input: 4.00, output: 18.00 }
+
+  # Running several models through the SAME CLI tool? Give each a unique `name`:
+  # - name: codex-mini
+  #   model: GPT-5-mini
+  #   tool: codex          # optional; otherwise derived from the command
+  #   type: cli
+  #   shell: true
+  #   command: 'codex exec --model gpt-5-mini --output-last-message /dev/fd/3 "$PROMPT" 3>&1 >/dev/null 2>&1'
+  #   pricing: { input: 0.50, output: 2.00 }
+
+  # --- HTTP APIs (exact token usage -> exact cost) ------------------------------------
+  # - name: gpt-4o
+  #   type: api
+  #   api: openai                 # openai-compatible (works for OpenRouter/KiloGateway too)
+  #   model: gpt-4o
+  #   base_url: https://api.openai.com/v1
+  #   api_key_env: OPENAI_API_KEY
+  #   pricing: { input: 2.50, output: 10.00 }
+  #
+  # - name: claude-opus
+  #   type: api
+  #   api: anthropic
+  #   model: claude-opus-4-8
+  #   api_key_env: ANTHROPIC_API_KEY
+  #   pricing: { input: 15.00, output: 75.00 }
+
+# Blind LLM-as-judge ENSEMBLE for `llm-rubric` grading and pairwise (open-ended) battles. Each
+# judge sees only output(s) + rubric, never which model produced them; pairwise order is swapped
+# across the ensemble to cancel position bias. Quality = MEAN of the judges' rubric scores;
+# inter-judge disagreement is recorded. Each entry uses the same schema as a model (CLI or API).
+# Use >=2 distinct judges for real de-biasing; a single entry behaves like the old `judge:`
+# (still accepted for back-compat). Cost scales with #judges — the response cache mitigates re-runs.
+judges:
+  # - name: judge-claude
+  #   type: cli
+  #   command: "claude --no-session-persistence --model claude-haiku-4-5 -p {prompt}"
+  #   pricing: { input: 15.00, output: 75.00 }
+
+  - name: judge-opencode
+    type: cli
+    command: "opencode run --model opencode/big-pickle --pure {prompt}"
+    pricing: { input: 0.00, output: 0.00 }
+  # - name: judge-gpt
+  #   type: api
+  #   api: openai
+  #   model: gpt-4o
+  #   api_key_env: OPENAI_API_KEY
+  #   pricing: { input: 2.50, output: 10.00 }
+
+# Reference model for the cross-run dashboard's baseline-relative speed/cost columns (must be a
+# model `name` above). If unset/absent in a run, the dashboard falls back to the cheapest (cost)
+# and fastest (speed) model in the selected pool. Per-run reports use best-in-run references.
+# baseline: claude-sonnet
+
+# Scoring is config-driven with FIXED anchors so scores stay comparable across runs.
+scoring:
+  weights: { quality: 1, speed: 1, cost: 1 }   # equal => overall is the 33/33/33 average
+  speed:
+    metric: tps                # tps (tokens/sec, default) or latency
+    anchor_tps: 50             # 50 tok/s -> 100 pts (linear, capped at 100)
+    anchor_latency_ms: 2000    # used only when metric: latency
+    # CLI tools pay a fixed per-call startup (process boot, auth, handshake) that has nothing to
+    # do with generation and unfairly crushes their tok/s. We calibrate it (a couple of trivial
+    # calls per CLI provider at run start, min latency = the floor) and subtract it from latency
+    # before computing speed, so CLI tools compare fairly with APIs. Raw latency is still stored.
+    calibrate_startup: true    # set false to score on raw end-to-end latency instead
+    calibration_runs: 2        # trivial warmup calls per CLI provider used to estimate startup
+  cost:
+    # Cost score is LINEAR and absolute: a free model -> 100, dropping evenly to 0 at this
+    # price. Comparable across runs. At $1/call almost every real model sits ~99-100, so the
+    # 0-100 score is a coarse guard — read the real cost difference from the leaderboard's
+    # `$/call` column and the interactive `vs <baseline>` multiplier (selectable in the HTML
+    # report). Lower this if you want the score itself to separate models sooner.
+    zero_score_usd_per_call: 0.01   # price at which the cost score hits 0 ($1/call = "crazy expensive")
+
+suite:
+  glob: "datasets/*.yaml"
+
+concurrency: 4
+runs_dir: runs
+cache_dir: .cache

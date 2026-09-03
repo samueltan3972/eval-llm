@@ -1,6 +1,10 @@
-#runs/
+runs/
 node_modules/
 .promptfoo/
+.cache/
+__pycache__/
+*.pyc
+.venv/
 .env
 .env.*
 !.env.example

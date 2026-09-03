@@ -1,48 +1,73 @@
 # Faithfulness / grounding — answer ONLY from provided context; admit when unknown.
-- description: "grounding: answer present in context"
+
+- description: "Answer present with distractors — extract the correct product name from a multi-product passage"
   vars:
     question: |
-      Using ONLY the context, answer the question.
-      Context: "Acme Corp was founded in 2011 in Berlin and employs 240 people across 3 offices."
-      Question: In which city was Acme Corp founded? Reply with only the city.
+      Context:
+      Orion Dynamics is a technology company offering three core products.
+      "Orion Shield" is their cybersecurity platform, launched in 2019, and currently serves 1,400 enterprise clients worldwide.
+      "Orion Lens" is their data analytics suite, launched in 2021, and is used by 3,200 mid-market firms for business intelligence and reporting.
+      "Orion Beacon" is their newest product — an AI-powered compliance tool launched in January 2024. It is currently in beta with 85 pilot customers.
+
+      Question: Which Orion Dynamics product is an AI-powered compliance tool? Reply with only the product name.
   assert:
     - type: icontains
-      value: "Berlin"
+      value: "Orion Beacon"
   metadata: { domain: faithfulness_grounding, tier: core }
 
-- description: "grounding: refuse when not in context"
+- description: "Refuse when answer is not in context — respond with 'I don't know'"
   vars:
     question: |
-      Using ONLY the context, answer the question. If the answer is not in the context, reply
-      exactly "I don't know".
-      Context: "Acme Corp was founded in 2011 in Berlin and employs 240 people across 3 offices."
+      Context:
+      Acme Corp was founded in 2011 in Berlin and employs 240 people across 3 offices.
+      The company specializes in supply-chain optimization software and reported annual revenue of €18 million in 2023.
+
+      Instruction: If the answer to the question is not found in the context above, reply exactly "I don't know".
+
       Question: Who is the CEO of Acme Corp?
   assert:
     - type: icontains
       value: "I don't know"
   metadata: { domain: faithfulness_grounding, tier: core }
 
-- description: "grounding: no hallucinated numbers"
+- description: "Counter-to-common-knowledge — ground answer in context even when it contradicts popular assumptions"
   vars:
     question: |
-      Using ONLY the context, answer the question. If the answer is not in the context, say so.
-      Context: "The 2023 survey covered 1,200 respondents in five countries. 62% preferred
-      option A."
-      Question: What percentage preferred option B? Answer in one short sentence.
+      Context:
+      Stratos AI was founded in 2017 and is headquartered in Reykjavik, Iceland.
+      Despite being widely assumed by industry observers to be based in Silicon Valley, the company has always operated from its original Reykjavik campus, which now spans three buildings and houses over 600 employees.
+
+      Question: According to the context, where is Stratos AI headquartered? Reply with only the city.
+  assert:
+    - type: icontains
+      value: "Reykjavik"
+  metadata: { domain: faithfulness_grounding, tier: core }
+
+- description: "No hallucinated numbers — must not fabricate the complement of a stated percentage"
+  vars:
+    question: |
+      Context:
+      The 2023 Global Consumer Preferences Survey covered 1,200 respondents across five countries.
+      When asked about their preferred payment method, 62% chose digital wallets.
+      The survey also found that 78% of respondents under age 30 had used a buy-now-pay-later service at least once.
+
+      Question: What percentage of respondents preferred traditional credit cards? Answer in one short sentence.
   assert:
     - type: llm-rubric
-      value: "States the context does not give option B's percentage (does NOT fabricate 38% or any other number as if stated). Noting 38% only as an inference from 62% is acceptable if clearly labeled as inferred."
+      value: "States that the context does not provide the percentage for traditional credit cards (does NOT fabricate 38% or any other number as if it were stated in the context). Noting that 38% is a mathematical complement is acceptable ONLY if clearly labeled as an inference, not a stated fact. The answer must also not confuse the 78% buy-now-pay-later figure with the payment preference question."
   metadata: { domain: faithfulness_grounding, tier: extended }
 
-- description: "grounding: contradiction resistance"
+- description: "Passage with correction — extract the revised figure, not the initial estimate"
   vars:
     question: |
-      Using ONLY the context, answer the question.
-      Context: "The library is open Monday to Friday, 9am-5pm. It is closed on weekends."
-      Question: Is the library open on Sunday? Answer 'Yes' or 'No' and quote the relevant phrase.
+      Context:
+      The Greendale Municipal Water Authority conducted its annual infrastructure audit in November 2024.
+      The initial estimate projected that the city's aging pipe network required replacement of 5,000 linear meters of pipe.
+      However, after a detailed recount using updated survey equipment, the actual figure was revised to 4,720 linear meters.
+      The revised figure excludes 280 meters of pipe that were found to have been replaced during emergency repairs earlier in the year.
+
+      Question: According to the passage, what is the actual revised figure for pipe replacement needed? Reply with only the number and unit.
   assert:
-    - type: regex
-      value: "(?i)\\bno\\b"
-    - type: llm-rubric
-      value: "Answers No and references that the library is closed on weekends."
+    - type: contains
+      value: "4,720"
   metadata: { domain: faithfulness_grounding, tier: extended }

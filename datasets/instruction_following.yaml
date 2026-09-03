@@ -25,25 +25,49 @@
         return !/e/i.test(output);
   metadata: { domain: instruction_following, tier: core }
 
-- description: "ifeval: exactly N bullet points"
+- description: "ifeval: multi-constraint"
   vars:
-    question: "List exactly four benefits of regular exercise as bullet points, each starting with '- '. Reply with only the bullets."
+    question: "Write exactly 3 sentences about space. Each sentence must contain exactly 10 words. Do not use the word 'star' or the word 'planet'. Reply with only the three sentences."
   assert:
     - type: javascript
       value: |
-        const bullets = output.split('\n').filter(l => l.trim().startsWith('-'));
-        return bullets.length === 4;
+        const text = output.trim();
+        const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+        if (sentences.length !== 3) return false;
+        for (const s of sentences) {
+          const words = s.trim().split(/\s+/).filter(Boolean);
+          if (words.length < 9 || words.length > 11) return false;
+        }
+        if (/\bstar\b/i.test(text)) return false;
+        if (/\bplanet\b/i.test(text)) return false;
+        return true;
   metadata: { domain: instruction_following, tier: extended }
 
-- description: "ifeval: JSON-only output"
+- description: "ifeval: nested JSON output"
   vars:
-    question: 'Reply with ONLY a JSON object of the form {"status": "ok", "count": 3}. No prose, no markdown fences.'
+    question: 'Reply with ONLY a JSON object with this exact structure: {"user": {"name": "Alice", "role": "admin"}, "permissions": ["read", "write"]}. No prose, no markdown fences.'
   assert:
     - type: is-json
       value:
         type: object
-        required: [status, count]
+        required: [user, permissions]
         properties:
-          status: { type: string }
-          count: { type: integer }
+          user:
+            type: object
+            required: [name, role]
+            properties:
+              name: { type: string }
+              role: { type: string }
+          permissions:
+            type: array
+            items: { type: string }
+    - type: contains-json
+      value:
+        type: object
+        properties:
+          user:
+            type: object
+            properties:
+              name: { const: "Alice" }
+              role: { const: "admin" }
   metadata: { domain: instruction_following, tier: extended }

@@ -9,7 +9,23 @@
         return lines.length === 3;
     - type: llm-rubric
       value: "Three evocative lines about autumn rain, roughly following 5-7-5 syllables, vivid and coherent."
-  metadata: { domain: creative_writing, tier: core }
+  # `kind` is optional: auto-detected (open_ended when an llm-rubric is present, else objective).
+  # Set it explicitly to override — e.g. force pairwise judging on, or off, for this case.
+  metadata: { domain: creative_writing, tier: core, kind: open_ended }
+
+- description: "creative: constrained ABC paragraph"
+  vars:
+    question: "Write a coherent paragraph of exactly 3 sentences. The first sentence must start with the letter A, the second with B, and the third with C. Reply with only the paragraph."
+  assert:
+    - type: javascript
+      value: |
+        const sentences = output.trim().split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+        if (sentences.length !== 3) return false;
+        const expected = ['A', 'B', 'C'];
+        return sentences.every((s, i) => s.trim()[0].toUpperCase() === expected[i]);
+    - type: llm-rubric
+      value: "A coherent, well-written paragraph of exactly three sentences where each sentence starts with the next letter A, B, C. The paragraph should read naturally and not feel forced."
+  metadata: { domain: creative_writing, tier: core, kind: open_ended }
 
 - description: "creative: product slogan"
   vars:
@@ -19,10 +35,14 @@
       value: "A single short, catchy, original slogan that fits a reusable water bottle brand and ideally nods to the name EverFlow. Not generic filler."
   metadata: { domain: creative_writing, tier: extended }
 
-- description: "creative: micro-story with required elements"
+- description: "creative: respectful disagreement dialogue"
   vars:
-    question: "Write a 3-sentence story that includes a lighthouse, a lost letter, and a sense of hope. Reply with only the story."
+    question: "Write a 4-line dialogue between two people who disagree on a topic but remain respectful throughout. Each line should be one character's speech. Reply with only the dialogue."
   assert:
+    - type: javascript
+      value: |
+        const lines = output.trim().split('\n').filter(l => l.trim().length > 0);
+        return lines.length >= 4;
     - type: llm-rubric
-      value: "A coherent 3-sentence story that meaningfully includes a lighthouse, a lost letter, and conveys hope. Roughly three sentences."
-  metadata: { domain: creative_writing, tier: extended }
+      value: "A dialogue of at least 4 lines between two people who clearly disagree on something yet remain civil, respectful, and constructive. The exchange should feel natural and realistic."
+  metadata: { domain: creative_writing, tier: extended, kind: open_ended }

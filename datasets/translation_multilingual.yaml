@@ -32,3 +32,11 @@
     - type: llm-rubric
       value: "Gives a natural German expression for heavy rain (e.g. 'Es regnet in Strömen' / 'Es schüttet') rather than a literal cats-and-dogs rendering."
   metadata: { domain: translation_multilingual, tier: extended }
+
+- description: "translate: technical medical (English to French)"
+  vars:
+    question: "Translate the following medical sentence to French. Use correct medical terminology. Reply with only the translation.\nSentence: 'The patient presented with acute onset of dyspnea and bilateral pleural effusion requiring immediate thoracentesis.'"
+  assert:
+    - type: llm-rubric
+      value: "A correct French medical translation using proper terminology: dyspnée (dyspnea), épanchement pleural bilatéral (bilateral pleural effusion), thoracentèse (thoracentesis). The meaning must be preserved accurately."
+  metadata: { domain: translation_multilingual, tier: extended }

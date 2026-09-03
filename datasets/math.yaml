@@ -1,40 +1,48 @@
 # Math & arithmetic — reference-based (deterministic) scoring.
-- description: "math: two-digit multiplication"
+# Problems are designed to be discriminating: distractors, naive-answer traps, multi-step reasoning.
+
+- description: "math: multi-step word problem with distractors"
   vars:
-    question: "What is 47 * 23? Reply with only the number, no commas, no words."
+    question: "A farmer has 3 fields. The first field produces 120 kg of wheat and 45 kg of barley. The second field produces 85 kg of wheat and 60 kg of barley. The third field produces 95 kg of wheat but its barley crop failed and produced nothing. The farmer sells only wheat at $4 per kg. The barley numbers are recorded for tax purposes only. How much revenue does the farmer earn from selling wheat? Reply with only the number."
   assert:
     - type: equals
-      value: "1081"
+      value: "1200"
+  # 120+85+95 = 300 kg wheat. 300*4 = 1200. Distractors: barley amounts (45, 60, 0) and the $4 price applied only to wheat.
   metadata: { domain: math, tier: core }
 
-- description: "math: word problem (rates)"
+- description: "math: probability (complement method)"
   vars:
-    question: "A train travels 60 km in 45 minutes. What is its average speed in km/h? Reply with only the number."
+    question: "A biased coin lands heads with probability 1/3. If you flip the coin 3 times, what is the probability of getting heads at least once? Reply with only the answer as a simplified fraction."
   assert:
-    - type: regex
-      value: "\\b80(\\.0+)?\\b"
+    - type: contains
+      value: "19/27"
+  # P(at least one H) = 1 - P(no H) = 1 - (2/3)^3 = 1 - 8/27 = 19/27. Naive answer might be 1/3+1/3+1/3=1 or other errors.
   metadata: { domain: math, tier: core }
 
-- description: "math: percentage"
+- description: "math: compound percentage (successive discounts)"
   vars:
-    question: "A jacket costs $80 and is discounted by 35%. What is the sale price in dollars? Reply with only the number."
-  assert:
-    - type: regex
-      value: "\\b52(\\.0+)?\\b"
-  metadata: { domain: math, tier: core }
-
-- description: "math: multi-step word problem"
-  vars:
-    question: "Sara has 3 boxes with 12 apples each. She gives away 7 apples, then buys 2 more boxes of 12. How many apples does she have? Reply with only the number."
+    question: "A store applies a 20% discount to a $250 item, then applies an additional 15% discount to the already-reduced price. What is the final price in dollars? Reply with only the number."
   assert:
     - type: equals
-      value: "53"
+      value: "170"
+  # 250 * 0.80 = 200; 200 * 0.85 = 170. Common error: treating it as a single 35% discount → $162.50.
+  metadata: { domain: math, tier: core }
+
+- description: "math: systems of equations word problem"
+  vars:
+    question: "A movie theater sells adult tickets for $12 and child tickets for $8. On Saturday, the theater sold 150 tickets and collected $1,540 in revenue. How many adult tickets were sold? Reply with only the number."
+  assert:
+    - type: equals
+      value: "85"
+  # Let a = adult, c = child. a + c = 150 and 12a + 8c = 1540. From first: c = 150 - a. Substitute: 12a + 8(150 - a) = 1540 → 12a + 1200 - 8a = 1540 → 4a = 340 → a = 85.
   metadata: { domain: math, tier: extended }
 
-- description: "math: unit conversion"
+- description: "math: combinatorics with constraint"
   vars:
-    question: "How many minutes are there in 3.5 hours? Reply with only the number."
+    question: "A committee of 4 people must be formed from a group of 6 men and 5 women. The committee must include at least 2 women. How many different committees are possible? Reply with only the number."
   assert:
     - type: equals
-      value: "210"
+      value: "215"
+  # At least 2 women: exactly 2W + exactly 3W + exactly 4W.
+  # C(5,2)*C(6,2) + C(5,3)*C(6,1) + C(5,4)*C(6,0) = 10*15 + 10*6 + 5*1 = 150 + 60 + 5 = 215.
   metadata: { domain: math, tier: extended }

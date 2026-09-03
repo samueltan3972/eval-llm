@@ -1,40 +1,40 @@
 # Classification — reference-based single-label.
-- description: "classify: sentiment positive"
+- description: "classify: sarcastic sentiment"
   vars:
-    question: "Classify the sentiment of this review as exactly one word: Positive, Negative, or Neutral.\nReview: 'Absolutely loved it — best purchase I've made all year!'\nReply with only the label."
-  assert:
-    - type: icontains
-      value: "Positive"
-  metadata: { domain: classification, tier: core }
-
-- description: "classify: sentiment negative"
-  vars:
-    question: "Classify the sentiment of this review as exactly one word: Positive, Negative, or Neutral.\nReview: 'It broke after two days and support never replied.'\nReply with only the label."
+    question: "Classify the sentiment as exactly one word: Positive, Negative, or Neutral.\nText: 'Oh wonderful, my flight got cancelled and I spent five extra hours at the airport. Best day ever.'\nReply with only the label."
   assert:
     - type: icontains
       value: "Negative"
   metadata: { domain: classification, tier: core }
 
-- description: "classify: topic"
+- description: "classify: mixed sentiment"
   vars:
-    question: "Classify the topic of this headline as one of: Sports, Politics, Technology, Health.\nHeadline: 'New smartphone chip doubles battery life while cutting power draw.'\nReply with only the label."
+    question: "Classify the overall sentiment as exactly one word: Positive, Negative, or Neutral.\nReview: 'The camera quality is stunning but the battery barely lasts two hours and customer support was unhelpful.'\nReply with only the label."
   assert:
     - type: icontains
-      value: "Technology"
+      value: "Negative"
   metadata: { domain: classification, tier: core }
 
-- description: "classify: intent"
+- description: "classify: cross-domain topic"
   vars:
-    question: "Classify the user's intent as one of: Refund, Complaint, Question, Praise.\nMessage: 'How do I reset my password?'\nReply with only the label."
+    question: "Classify the topic of this headline as one of: Sports, Politics, Technology, Health.\nHeadline: 'CRISPR gene therapy trial shows promising results for treating hereditary blindness in children'\nReply with only the label."
   assert:
     - type: icontains
-      value: "Question"
+      value: "Health"
+  metadata: { domain: classification, tier: core }
+
+- description: "classify: implicit intent"
+  vars:
+    question: "Classify the user's intent as one of: Question, Complaint, Praise, Cancellation.\nMessage: 'I placed my order three weeks ago and it still hasn't shipped.'\nReply with only the label."
+  assert:
+    - type: icontains
+      value: "Complaint"
   metadata: { domain: classification, tier: extended }
 
-- description: "classify: NLI (entailment)"
+- description: "classify: NLI tricky neutral"
   vars:
-    question: "Given the premise and hypothesis, answer with exactly one of: Entailment, Contradiction, Neutral.\nPremise: 'A man is playing a guitar on stage.'\nHypothesis: 'A person is making music.'\nReply with only the label."
+    question: "Given the premise and hypothesis, answer with exactly one of: Entailment, Contradiction, Neutral.\nPremise: 'Students who exercise regularly tend to score higher on standardized tests.'\nHypothesis: 'Exercise directly improves test scores.'\nReply with only the label."
   assert:
     - type: icontains
-      value: "Entailment"
+      value: "Neutral"
   metadata: { domain: classification, tier: extended }

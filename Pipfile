@@ -4,8 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pyyaml = "*"
+python-dotenv = "*"
+jsonschema = "*"
+httpx = "*"
+rich = "*"
+streamlit = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.14"
+
+[scripts]
+benchmark = "python -m benchmark"
+test = "pytest -q"

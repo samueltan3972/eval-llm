@@ -1,81 +1,134 @@
 # Structured extraction — JSON output validated against a schema + field checks.
-- description: "extract: contact to JSON (schema)"
+- description: "extract: primary contact from multi-person text"
   vars:
     question: |
-      Extract the contact details into JSON with keys "name" (string), "email" (string),
-      and "age" (integer). Reply with ONLY the JSON object, no markdown fences.
-      Text: "Jane Doe (jane.doe@acme.io), age 34, signed up yesterday."
+      Extract the PRIMARY contact's details into JSON with keys "name" (string), "email" (string),
+      and "phone" (string). Reply with ONLY the JSON object, no markdown fences.
+      Text: "For general questions reach out to the front desk (info@corp.io). Your account manager
+      is Lisa Park (lisa.park@corp.io, 555-0142). Her assistant Tom can also help (tom.r@corp.io)."
   assert:
     - type: is-json
       value:
         type: object
-        required: [name, email, age]
+        required: [name, email, phone]
         properties:
           name: { type: string }
           email: { type: string }
-          age: { type: integer }
+          phone: { type: string }
     - type: contains
-      value: "jane.doe@acme.io"
+      value: "lisa.park@corp.io"
   metadata: { domain: extraction_structured, tier: core }
 
-- description: "extract: order to JSON (schema + values)"
+- description: "extract: nested order with line_items"
   vars:
     question: |
-      Extract the order into JSON with keys "item" (string), "quantity" (integer),
-      and "unit_price" (number). Reply with ONLY the JSON object, no markdown fences.
-      Text: "Customer ordered 3 wireless mice at $24.50 each."
+      Extract the order into JSON with keys "order_id" (string), "customer" (string),
+      and "line_items" (array of objects each with "product" (string), "quantity" (integer),
+      and "unit_price" (number)). Reply with ONLY the JSON object, no markdown fences.
+      Text: "Order #A-7821 for customer Raj Patel: 2x Bluetooth Speaker at $34.99 each and
+      5x USB-C Cable at $8.50 each."
   assert:
     - type: is-json
       value:
         type: object
-        required: [item, quantity, unit_price]
+        required: [order_id, customer, line_items]
         properties:
-          item: { type: string }
-          quantity: { type: integer }
-          unit_price: { type: number }
+          order_id: { type: string }
+          customer: { type: string }
+          line_items:
+            type: array
+            items:
+              type: object
+              required: [product, quantity, unit_price]
+              properties:
+                product: { type: string }
+                quantity: { type: integer }
+                unit_price: { type: number }
+  metadata: { domain: extraction_structured, tier: core }
+
+- description: "extract: messy informal text to meeting JSON"
+  vars:
+    question: |
+      Extract the meeting details into JSON with keys "attendee" (string), "time" (string),
+      "room" (string), "topic" (string), and "estimated_budget" (number).
+      Reply with ONLY the JSON object, no markdown fences.
+      Text: "mtg w/ Sarah @ 3pm tmrw, rm 204, re: Q4 budget — est. $45k"
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [attendee, time, room, topic, estimated_budget]
+        properties:
+          attendee: { type: string }
+          time: { type: string }
+          room: { type: string }
+          topic: { type: string }
+          estimated_budget: { type: number }
+  metadata: { domain: extraction_structured, tier: core }
+
+- description: "extract: updated/corrected price"
+  vars:
+    question: |
+      Extract the CURRENT product listing into JSON with keys "product" (string),
+      "original_price" (number), and "current_price" (number).
+      Reply with ONLY the JSON object, no markdown fences.
+      Text: "The ProMax Wireless Earbuds were originally listed at $89.99,
+      now marked down to $62.99 for the summer sale."
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [product, original_price, current_price]
+        properties:
+          product: { type: string }
+          original_price: { type: number }
+          current_price: { type: number }
     - type: contains-json
       value:
         type: object
         properties:
-          quantity: { const: 3 }
-  metadata: { domain: extraction_structured, tier: core }
-
-- description: "extract: list of entities"
-  vars:
-    question: |
-      From the sentence, extract all person names into a JSON array of strings under the key
-      "people". Reply with ONLY the JSON object, no markdown fences.
-      Sentence: "After the meeting, Priya and Marcus reviewed the notes with Elena."
-  assert:
-    - type: is-json
-      value:
-        type: object
-        required: [people]
-        properties:
-          people:
-            type: array
-            items: { type: string }
-    - type: contains-all
-      value: ["Priya", "Marcus", "Elena"]
+          current_price: { const: 62.99 }
   metadata: { domain: extraction_structured, tier: extended }
 
-- description: "extract: boolean + enum field"
+- description: "extract: complex structure with optional fields and arrays"
   vars:
     question: |
-      Extract into JSON with keys "sentiment" (one of "positive","negative","neutral") and
-      "actionable" (boolean: true if it requests an action). Reply with ONLY the JSON object.
-      Text: "Please cancel my subscription, I'm not happy with the service."
+      Extract the event into JSON with keys "event_name" (string), "date" (string),
+      "location" (object with "venue" (string) and "city" (string)),
+      "speakers" (array of objects each with "name" (string), "title" (string),
+      and optionally "company" (string)),
+      and optionally "registration_fee" (number, if mentioned).
+      Reply with ONLY the JSON object, no markdown fences.
+      Text: "Join us at DevSummit 2026 on August 15th at the Grand Convention Center, Austin.
+      Speakers include Dr. Ana Ruiz (CTO, NovaTech) and Marcus Webb (Lead Engineer).
+      Early-bird registration is $199."
   assert:
     - type: is-json
       value:
         type: object
-        required: [sentiment, actionable]
+        required: [event_name, date, location, speakers]
         properties:
-          sentiment: { type: string, enum: [positive, negative, neutral] }
-          actionable: { type: boolean }
+          event_name: { type: string }
+          date: { type: string }
+          location:
+            type: object
+            required: [venue, city]
+            properties:
+              venue: { type: string }
+              city: { type: string }
+          speakers:
+            type: array
+            items:
+              type: object
+              required: [name, title]
+              properties:
+                name: { type: string }
+                title: { type: string }
+                company: { type: string }
+          registration_fee: { type: number }
     - type: contains-json
       value:
         type: object
         properties:
-          actionable: { const: true }
+          registration_fee: { const: 199 }
   metadata: { domain: extraction_structured, tier: extended }
